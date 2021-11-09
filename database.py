@@ -58,6 +58,14 @@ def queryAthlete(athleteId):
         print(str(e))
         return None
 
+def queryAthleteByName(first, last):
+    try:
+        collection_name = getCollection(ATHLETE_COLLECTION)
+        return collection_name.find_one({'first' : first, 'last' : last})
+    except Exception as e:
+        print(str(e))
+        return None
+
 def getAllAthletes(sort_by='name'):
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
@@ -149,7 +157,8 @@ def getScoreByAthlete(athleteId, workoutId):
 if __name__ == "__main__":
     athlete1 = {
         "_id" : 69,
-        "name" : "Henry Vecchione",
+        "first" : "Henry",
+        "last" : "Vecchione",
         "permissions" : ["admin"],
         "prs" : {
             "2000m" : "6:24",
@@ -167,7 +176,8 @@ if __name__ == "__main__":
     }
     athlete2 = {
         "_id" : 1,
-        "name" : "Cal Gorvy",
+        "first" : "Cal",
+        "last" : "Gorvy",
         "permissions" : [],
         "prs" : {
             "2000m" : "5:59",
@@ -176,6 +186,44 @@ if __name__ == "__main__":
         "workouts" : [],
         "side" : ["starboard"],
         "class" : 2025,
+        "active" : True,
+        "awards" : {
+            "earc" : ['4V'],
+            "ira" : ['1V'],
+            "shirts" : ['g','de','n','h','y','t','p']
+        }
+    }
+    athlete3 = {
+        "_id" : 2,
+        "first" : "Peter",
+        "last" : "Skinner",
+        "permissions" : [],
+        "prs" : {
+            "2000m" : "5:59",
+            "6000m" : "17:24"
+        },
+        "workouts" : [],
+        "side" : ["port"],
+        "class" : 2023,
+        "active" : True,
+        "awards" : {
+            "earc" : ['4V'],
+            "ira" : ['1V'],
+            "shirts" : ['g','de','n','h','y','t','p']
+        }
+    }
+    athlete4 = {
+        "_id" : 3,
+        "first" : "Will",
+        "last" : "Olson",
+        "permissions" : [],
+        "prs" : {
+            "2000m" : "5:59",
+            "6000m" : "17:24"
+        },
+        "workouts" : [],
+        "side" : ["port"],
+        "class" : 2023,
         "active" : True,
         "awards" : {
             "earc" : ['4V'],
@@ -207,6 +255,7 @@ if __name__ == "__main__":
         'notes' : 'wowwwee',
         'test' : False
     }
+
 
     for a in getAllAthletes(sort_by='class'):
         pprint(a)

@@ -24,11 +24,15 @@ def autoTitle(pieces):
 
     if count == 1:
         out += str(count)+'x'
-    return ', '.join((out + last).split(',')[:-1])
+        final = ', '.join((out + last).split(',')[:-1])
+    else:
+        final =  str(count) + 'x'+last
+
+    return final
 
 if __name__ == "__main__":
     p1 = ['2000m']
-    p2 = ['2000m','2000m','2000m', '1500m']
+    p2 = ['2000m','2000m','2000m']
     p3 = ['4000m', '3000m','2000m', '2000m']
 
     print(autoTitle(p1))
