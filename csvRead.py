@@ -41,6 +41,8 @@ def csvReader(filename:str):
 
     return(workoutDict)
 
+
+# ------------------------------------------------------------------- #
     
 def csvBlank(athleteList):
     """ function for creating a blank CSV file of the format for the function above.
@@ -60,17 +62,21 @@ def csvBlank(athleteList):
     writer.writerows(header)
 
     for a in athleteList:
-        row = [a['_id'], a['name'], '', '', '', '', '', '']
+        row = [a['_id'], a['name'], '(mm:ss / YYYYm)', '', '', '', '', '']
         writer.writerow(row)
 
     blank.close()
 
 
-
+# ------------------------------------------------------------------- #
+# test code
 
 if __name__ == "__main__":
     pprint(csvReader('test1.csv'))
 
-    athleteList = [{'_id' : 1, 'name' : 'Cal'}, {'_id' : 2, 'name' : 'Will'}, {'_id' : 3, 'name' : 'Ethan'}, {'_id' : 4, 'name' : 'Peter'}]
+    athleteList = [{'_id' : 1, 'name' : 'Cal'}, \
+        {'_id' : 2, 'name' : 'Will'}, \
+            {'_id' : 3, 'name' : 'Ethan'}, \
+                {'_id' : 4, 'name' : 'Peter'}]
 
     csvBlank(athleteList)
