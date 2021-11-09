@@ -3,10 +3,14 @@ import pymongo
 import datetime
 from pprint import pprint
 import os 
-from dotenv import load_dotenv
-load_dotenv()
 
-CONNECTION_STRING = os.environ.get('database_url')
+if 'database_url' not in os.environ:
+    from dotenv import load_dotenv
+    load_dotenv()
+    CONNECTION_STRING = os.environ.get('database_url')
+else:
+    CONNECTION_STRING = os.environ['database_url']
+    
 DBNAME = 'irgo'
 ATHLETE_COLLECTION = 'athletes'
 WORKOUT_COLLECTION = 'workouts'
