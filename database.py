@@ -1,6 +1,5 @@
 from pymongo import MongoClient
 import pymongo
-import secret
 import datetime
 from pprint import pprint
 import os 
