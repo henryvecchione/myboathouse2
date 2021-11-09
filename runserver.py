@@ -2,7 +2,7 @@
 
 from sys import argv, exit, stderr
 #from os import system
-from stravify import app
+from irgo import app
 
 def main(argv):
 
