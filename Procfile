@@ -1,1 +1,1 @@
-web: gunicorn stravify:app
+web: gunicorn irgo:app
