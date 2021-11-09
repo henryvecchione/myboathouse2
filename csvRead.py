@@ -6,6 +6,7 @@ def csvReader(filename:str):
     Takes filename as input, creates a dictionary with keys "distances" -- 
     the lengths of the pieces -- 
     and each athlete with a list of their scores for each piece"""
+    out = {}
 
     # read the csv
     csvFile = open(filename)
@@ -15,16 +16,20 @@ def csvReader(filename:str):
 
     # first row of csv
     header = lines[0]
+    notesLine = lines[1]
     pieces = [] # the keys from the first row, eg. 'Piece 1', 'Piece 2' etc. Allows any number of pieces
     distances = []  # the distance or time of the piece
+    notes = [] # notes per piece
     for key in header:
         if 'Piece ' in key:
             pieces.append(key)
             distances.append(header[key])
+            notes.append(notesLine[key])
+    
 
     # from the rest of the lines, make a dict of format {athlete : [p1score, p2score, ...]}
     scoresByAthlete = {}
-    for i in range(1, len(lines)):
+    for i in range(2, len(lines)):
         row = lines[i]
         athlete = row['MyBoathouse']
         scores = []
@@ -34,8 +39,8 @@ def csvReader(filename:str):
         scoresByAthlete[athlete] = scores
 
 
-    out = {}
     out['distances'] = distances
+    out['notes'] = notes
     out['scores_by_athlete'] = scoresByAthlete
 
     print(out)
@@ -47,4 +52,4 @@ def csvReader(filename:str):
 
 
 if __name__ == "__main__":
-    csvReader()
+    csvReader('test.csv')
