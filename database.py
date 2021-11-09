@@ -1,7 +1,8 @@
 from pymongo import MongoClient
 import pymongo
 import secret
-import certifi
+import datetime
+from pprint import pprint
 
 CONNECTION_STRING = secret.database_url
 DBNAME = 'irgo'
@@ -50,6 +51,15 @@ def queryAthlete(athleteId):
     except Exception as e:
         print(str(e))
         return None
+
+def getAllAthletes(sort_by='name'):
+    try:
+        collection_name = getCollection(ATHLETE_COLLECTION)
+        return collection_name.find({}, sort=[(sort_by, pymongo.ASCENDING)])
+    except Exception as e:
+        print(str(e))
+        return None
+
 # ------------------------------------------------------------------- #
 # general workout collection methods 
 
@@ -79,22 +89,52 @@ def queryWorkout(workoutId):
         print(str(e))
         return None
 
+def getAllWorkouts(sort_by='date'):
+    try:
+        collection_name = getCollection(WORKOUT_COLLECTION)
+        return collection_name.find({}, sort=[(sort_by, pymongo.DESCENDING)])
+    except Exception as e:
+        print(str(e))
+        return None
 # ------------------------------------------------------------------- #
-
 # takes a workout ID, gets all participating athletes, and adds that 
 # workout to each athlete's 'workouts' array
 def attributeWorkout(workoutId):
     try:
         athletes_collection = getCollection(ATHLETE_COLLECTION)
         workout_collection = getCollection(WORKOUT_COLLECTION)
+
         workout = workout_collection.find_one({'_id' : workoutId})
+        # athletes who completeted the workout
         participating = [int(k) for k in workout['scores'].keys()]
-        result = athletes_collection.update_many({'_id' : {'$in' : participating}}, {'$push' : {'workouts' : workoutId}})
+        result = athletes_collection.update_many({'_id' : {'$in' : participating}}, {'$addToSet' : {'workouts' : workoutId}})
         return result.modified_count
 
     except Exception as e:
         print(str(e))
         return None
+
+
+# ------------------------------------------------------------------- #
+# gets athleteId's scores on workoutId
+# return a list [(distance, time)] 
+def getScoreByAthlete(athleteId, workoutId):
+    try:
+        workout_collection = getCollection(WORKOUT_COLLECTION)
+        result = workout_collection.find_one({'_id' : workoutId })
+        if not result:
+            print('No workout with id ' + str(workoutId))
+            return None
+        try:
+            return zip(result['pieces'] , result['scores'][str(athleteId)])
+        except KeyError as _:
+            print('Athlete with id ' + str(athleteId) + ' did not complete this workout')
+            return None
+
+    except Exception as e:
+        print(str(e))
+        return None
+
 
 
 # ------------------------------------------------------------------- #
@@ -140,7 +180,7 @@ if __name__ == "__main__":
     workout1 = {
         '_id' : 1,
         'title' : '2x4000m, 3000m',
-        'date' : '11/08/21',
+        'date' : datetime.datetime(2021, 11, 8),
         'pieces' : ['4000m', '4000m', '3000m'],
         'scores' : {
             '69' : ['15:12', '15:25' , '12:00'],
@@ -149,16 +189,23 @@ if __name__ == "__main__":
         'notes' : 'open rate',
         'test' : False
     }
-    print(queryAthlete(69))
-    print(queryAthlete(1))
-    print(editAthlete(69, 'prs', '6:24'))
-    print(editAthlete(1, 'side', ['port']))
-    print(queryAthlete(69))
-    print(queryAthlete(1))
+    workout2 = {
+        '_id' : 2,
+        'title' : '6x2000m',
+        'date' : datetime.datetime(2021, 10, 31),
+        'pieces' : ['2000m','2000m','2000m','2000m','2000m','2000m'],
+        'scores' : {
+            '69' : ['15:12', '15:25' , '12:00','15:12', '15:25' , '12:00'],
+            '1' : ['13:14', '14:20', '13:15','13:14', '14:20', '13:15']
+        },
+        'notes' : 'wowwwee',
+        'test' : False
+    }
 
-    print(queryWorkout(1))
-    print(attributeWorkout(1))
-    print(queryAthlete(69))
-    print(queryAthlete(1))
+    for a in getAllAthletes(sort_by='class'):
+        pprint(a)
+    for w in getAllWorkouts():
+        pprint(w)
 
-
+    for z in getScoreByAthlete(69,2):
+        pprint(z)
