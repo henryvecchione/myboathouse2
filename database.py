@@ -3,8 +3,11 @@ import pymongo
 import secret
 import datetime
 from pprint import pprint
+import os 
+from dotenv import load_dotenv
+load_dotenv()
 
-CONNECTION_STRING = secret.database_url
+CONNECTION_STRING = os.environ.get('database_url')
 DBNAME = 'irgo'
 ATHLETE_COLLECTION = 'athletes'
 WORKOUT_COLLECTION = 'workouts'
