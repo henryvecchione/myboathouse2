@@ -10,4 +10,5 @@ pytz
 requests
 urllib3==1.26.4
 pymongo
+dotenv
 
