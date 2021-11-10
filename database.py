@@ -52,6 +52,7 @@ def editAthlete(athleteId, field, newVal):
 
 def queryAthlete(athleteId):
     try:
+        athleteId = int(athleteId)
         collection_name = getCollection(ATHLETE_COLLECTION)
         return collection_name.find_one({'_id' : athleteId})
     except Exception as e:
@@ -100,6 +101,7 @@ def editWorkout(workoutId, field, newVal):
 
 def queryWorkout(workoutId):
     try:
+        workoutId = int(workoutId)
         collection_name = getCollection(WORKOUT_COLLECTION)
         return collection_name.find_one({'_id' : workoutId})
     except Exception as e:
