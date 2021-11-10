@@ -66,10 +66,13 @@ def queryAthleteByName(first, last):
         print(str(e))
         return None
 
-def getAllAthletes(sort_by='name'):
+def getAllAthletes(sort_by='name', active_only=False):
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
-        return collection_name.find({}, sort=[(sort_by, pymongo.ASCENDING)])
+        if active_only:
+            return collection_name.find({'active': True}, sort=[(sort_by, pymongo.ASCENDING)])
+        else:
+            return collection_name.find({}, sort=[(sort_by, pymongo.ASCENDING)])
     except Exception as e:
         print(str(e))
         return None
