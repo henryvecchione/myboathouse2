@@ -27,8 +27,8 @@ def xlsxRead(filename):
             continue
         # this isn't obvious but necessitated by structure of sheet
         col = data[i]
-        first = col['MyBoathouse']
-        last = col['Piece:']
+        first = col['MyBoathouse'].capitalize()
+        last = col['Piece:'].capitalize()
         athleteId = db.queryAthleteByName(first, last)['_id']
         scores = []
         for piece in pieces:
@@ -41,11 +41,45 @@ def xlsxRead(filename):
         'scores' : scoresDict,
         'notes' : notes
     }
+    
 
     return workoutDict
 
 def xlsxWrite():
-    return NotImplemented
+    # create the workbook
+    workbook = xlsxwriter.Workbook('blank.xlsx')
+    worksheet = workbook.add_worksheet() # sheet for scores
+    worksheet1 = workbook.add_worksheet() # roster sheet
+    bold = workbook.add_format({'bold' : True})
+
+    # score sheet header info
+    header = ['MyBoathouse', 'Piece:', '(XXXXm | mm:ss)', '(XXXXm | mm:ss)', '(XXXXm | mm:ss)']
+    notes = ['YYYY-MM-DD', 'Notes:']
+    firstLast = ['First', 'Last']
+    example = ['(mm:ss | YYYYm)','(mm:ss | YYYYm)','(mm:ss | YYYYm)']
+    worksheet.write_row('A1', header, bold)
+    worksheet.write_row('A2', notes, bold)
+    worksheet.write_row('A3', firstLast, bold)
+    worksheet.write_row('C4', example)
+
+    # write the vlookup formula that fills names from the roser
+    for i in range(4, 50):
+        cell = 'A' + str(i)
+        formula = '=IF(B{}<>"",VLOOKUP(B{},Sheet2!A:B,2,FALSE), "")'.format(str(i),str(i))
+        worksheet.write_formula(cell, formula)
+
+    # write in the athletes
+    ind = 1
+    athletes = db.getAllAthletes()
+    for a in athletes:
+        nameRow = [a['last'], a['first']]
+        cell = 'A' + str(ind)
+        worksheet1.write_row(cell, nameRow)
+        ind +=1
+
+    workbook.close()
+
 
 if __name__ == "__main__":
-    pprint((xlsxRead('test.xlsx')))
+    pprint((xlsxRead('test2.xlsx')))
+    # xlsxWrite()
