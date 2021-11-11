@@ -37,7 +37,7 @@
                                 <th scope="col">Name</th>
                                 <th scope="col">Average</th>
                                 {% for piece in workout['pieces'] %}
-                                <th scope="col">{{piece}}</th>
+                                <th class="collapse" scope="col">{{piece}}</th>
                                 {% endfor %}
                               </tr>
                             </thead>
@@ -45,17 +45,35 @@
                             {% for id in scores %}
                                 <tr>
                                     <th scope="row">{{loop.index}}</th>
-                                    <td>{{athletes[id]['first']}} {{athletes[id]['last']}} </td>
-                                    <td>TODO</td>
-                                    {% for score in scores[id] %}
+                                    <td><a href="#splits{{loop.index}}" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="splits{{loop.index}}">{{athletes[id]['first']}} {{athletes[id]['last']}} </a></td>
+                                    
+                                    <td><a href="#splits{{loop.index}}" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="splits{{loop.index}}">TODO</a></td>
+                                    <!-- {% for score in scores[id] %}
                                         <td>{{score}}</td>
-                                    {% endfor %}
+                                    {% endfor %} -->
+                                    
                                 </tr>
+                                <tr class="collapse" id="splits{{loop.index}}">
+                                    <td></td>
+                                    <!-- <td></td> -->
+                                    <td>
+                                        <table>
+                                            <tbody>
+                                                {% for score in scores[id] %}
+                                                <td>{{score}}</td>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+
+
                             {% endfor %}
 
                               
                             </tbody>
                           </table>
+
                     </div>
                     
                 </div>

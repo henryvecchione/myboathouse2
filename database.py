@@ -177,7 +177,8 @@ if __name__ == "__main__":
             "earc" : [],
             "ira" : [],
             "shirts" : ['g','de','n','da','t','p']
-        }
+        },
+        "teamId" : 1
     }
     athlete2 = {
         "_id" : 1,
@@ -196,7 +197,8 @@ if __name__ == "__main__":
             "earc" : ['4V'],
             "ira" : ['1V'],
             "shirts" : ['g','de','n','h','y','t','p']
-        }
+        },
+        "teamId" : 1
     }
     athlete3 = {
         "_id" : 2,
@@ -215,7 +217,8 @@ if __name__ == "__main__":
             "earc" : ['4V'],
             "ira" : ['1V'],
             "shirts" : ['g','de','n','h','y','t','p']
-        }
+        },
+        "teamId" : 1
     }
     athlete4 = {
         "_id" : 3,
@@ -234,7 +237,8 @@ if __name__ == "__main__":
             "earc" : ['4V'],
             "ira" : ['1V'],
             "shirts" : ['g','de','n','h','y','t','p']
-        }
+        },
+        "teamId" : 1
     }
     workout1 = {
         '_id' : 1,
