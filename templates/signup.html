@@ -31,37 +31,37 @@
                     {{error}}
                     <form action="" method="POST">
                         <div class="form-group">
-                            <label for="firstForm">First name</label>
+                            <label for="firstForm">First name * </label>
                             <input type="text" id= "firstForm" class="form-control" name="first" value="{{request.form.first}}" required>
                         </div>
                         <div class="form-group">
-                            <label for="lastForm">Last name</label>
+                            <label for="lastForm">Last name * </label>
                             <input type="text" id= "lastForm" class="form-control" name="last" value="{{request.form.last}}" required>
                         </div>
                         <div class="form-group">
-                          <label for="emailForm">Email address</label>
-                          <input type="email" id= "emailForm" class="form-control" name="username" value="{{request.form.username}}" required>
+                            <label for="emailForm">Email address * </label>
+                            <input type="email" id= "emailForm" class="form-control" name="username" value="{{request.form.username}}" required>
                         </div>
                         <div class="form-group">
-                          <label for="passwordForm">Password</label>
-                          <input type="password" class="form-control" name="password" id="passwordForm" value="{{request.form.password}}" required>
+                            <label for="passwordForm">Password * </label>
+                            <input type="password" class="form-control" name="password" id="passwordForm" value="{{request.form.password}}" required>
                         </div>
                         <div class="row">
                             <div class="col-6">
                                 <div class="form-group">
-                                    <label for="classForm">Class</label>
+                                    <label for="classForm">Class * </label>
                                     <input type="number" id= "classForm" class="form-control" name="class" value="{{request.form.class}}" required>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="form-group">
-                                    <label for="sideform">Side</label>
+                                <div class="form-check">
+                                    <label for="sideform">Side * </label>
                                     <div class="btn-group btn-group-toggle btn-block" data-toggle="buttons" id="sideform">
             
                                         <label class="btn btn-outline-success " for="starboardcheck" >Starboard
-                                        <input type="radio" name="side" autocomplete="off" value="starboard" id="starboardcheck" />
+                                        <input type="radio" name="side" autocomplete="off" value="starboard" id="starboardcheck" required />
                                         </label>
-
+    
                                         <label class="btn btn-outline-danger" for="portcheck">Port
                                         <input type="radio" name="side" autocomplete="off" value="port" id="portcheck" />
                                         </label>

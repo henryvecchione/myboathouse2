@@ -11,4 +11,5 @@ requests
 urllib3==1.26.4
 pymongo
 dnspython
+bcrypt==3.2.0
 

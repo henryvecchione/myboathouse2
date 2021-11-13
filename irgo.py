@@ -77,7 +77,7 @@ def user_loader(email):
         return
 
     user = User()
-    user.id = creds['email']
+    user.id = creds['_id']
     return user
 
 
@@ -87,10 +87,13 @@ def request_loader(request):
     if not email:
         return
 
-    user = User()
-    user.id = email
+    creds = db.getCredentials(email)
 
-    user.is_authenticated = request.form['password'] == users[1]
+    user = User()
+    user.id = creds['_id']
+    
+    password = bytes(request.form['password'], 'utf-8')
+    user.is_authenticated = bcrypt.checkpw(password, creds['pwhash'])
 
     return user
 #-----------------------------------------------------------------------
@@ -104,7 +107,7 @@ def signup():
         for k in request.form.keys():
             print(k)
         first = request.form['first']
-        last = request.form['first']
+        last = request.form['last']
         email = request.form['username']
         password = bytes(request.form['password'], 'utf-8')
         classYr = request.form['class']
@@ -148,6 +151,7 @@ def signup():
             if not add:
                 error = "failed to add user"
 
+            return()
 
 
 
