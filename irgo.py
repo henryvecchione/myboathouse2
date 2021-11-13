@@ -7,6 +7,8 @@ import os
 import urllib3
 import database as db
 import random
+import bcrypt
+import secret
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -15,14 +17,148 @@ STATIC_DIR = './static'
 
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
+app.secret_key = secret.secret_key
+app.config['SECRET_KEY'] = app.secret_key
+
+login_manager = flask_login.LoginManager()
+login_manager.login_view = '/login'
+login_manager.init_app(app)
+
+class User(flask_login.UserMixin):
+    pass
+
 
 @app.route('/', methods=['GET'])
 def index():
     html = render_template('index.html')
     return make_response(html)
+# ---------------------------------------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error=''
+    if request.method == 'POST':
+
+        email = request.form['username']
+        password = bytes(request.form['password'],'utf-8')
+
+        creds = db.getCredentials(email)
+
+
+        session.clear()
+
+        # getCredentials returns none if email not found in DB
+        if not creds:
+            error = 'Missing Credentials. Please try again.'
+        # else check password hash
+        else:
+            user = user_loader(email)   
+            email = creds['email']
+            pwHash = creds['pwHash']
+            salt = creds['salt']
+
+            verified = bcrypt.checkpw(password, pwHash)
+            if verified:
+                flask_login.login_user(user)
+                session.permanent = False
+                return redirect('/workouts')
+            else:
+                error = 'Invalid Credentials. Please try again.'
+            
+
+
+    return render_template('login.html', error=error)
+
+
+@login_manager.user_loader
+def user_loader(email):
+    creds = db.getCredentials(email)
+    if not creds:
+        return
+
+    user = User()
+    user.id = creds['email']
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+    email = request.form.get('email')
+    if not email:
+        return
+
+    user = User()
+    user.id = email
+
+    user.is_authenticated = request.form['password'] == users[1]
+
+    return user
+#-----------------------------------------------------------------------
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+
+    error =''
+
+    if request.method =='POST':
+        for k in request.form.keys():
+            print(k)
+        first = request.form['first']
+        last = request.form['first']
+        email = request.form['username']
+        password = bytes(request.form['password'], 'utf-8')
+        classYr = request.form['class']
+        side = request.form['side']
+
+        
+        salt = bcrypt.gensalt()
+        pwhash = bcrypt.hashpw(password, salt)
+
+        checkIfNew = db.getCredentials(email)
+        if checkIfNew:
+            error = 'Account already exists with this email'
+        else:
+            newId = random.randint(10, 100000)
+            add = db.addCredentials(newId, email, pwhash, salt)
+            if not add:
+                error = 'failed to add user'
+
+            athlete = {
+                "_id" : newId,
+                "first" : first,
+                "last" : last,
+                "permissions" : [],
+                "prs" : {
+                    "2000m" : '-1',
+                    "6000m" : '-1'
+                },
+                "workouts" : [],
+                "side" : side,
+                "class" : classYr,
+                "active" : True,
+                "awards" : {
+                    "earc" : [],
+                    "ira" : [],
+                    "shirts" : []
+                },
+                "teamId" : 1
+            }
+
+            add = db.addAthlete(athlete)
+            if not add:
+                error = "failed to add user"
+
+
+
+
+    html = render_template('signup.html', error=error)
+    return make_response(html)
+
+
 
 #-----------------------------------------------------------------------
 @app.route('/workouts', methods=['GET'])
+@flask_login.login_required
 def workouts():
 
     workouts = db.getAllWorkouts()
@@ -31,6 +167,7 @@ def workouts():
     return make_response(html)
 
 @app.route('/workout', methods=['GET'])
+@flask_login.login_required
 def workout():
     workoutId = request.args.get('w')
     workout = db.queryWorkout(workoutId)
@@ -47,8 +184,12 @@ def workout():
             'side' : ath['side']
         }
 
-    html = render_template('workout.html' , workout=workout, scores=scores, athletes=athletes)
+    html = render_template('workout_dropdown.html' , workout=workout, scores=scores, athletes=athletes)
     return make_response(html)
+
+
+
+
 
 #-----------------------------------------------------------------------
 

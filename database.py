@@ -3,6 +3,7 @@ import pymongo
 import datetime
 from pprint import pprint
 import os 
+import bcrypt
 
 if 'database_url' not in os.environ:
     from dotenv import load_dotenv
@@ -14,6 +15,7 @@ else:
 DBNAME = 'irgo'
 ATHLETE_COLLECTION = 'athletes'
 WORKOUT_COLLECTION = 'workouts'
+CREDENTIALS_COLLECTION = 'credentials'
 
 # ------------------------------------------------------------------- #
 # General Database methods
@@ -154,6 +156,33 @@ def getScoreByAthlete(athleteId, workoutId):
         print(str(e))
         return None
 
+# ------------------------------------------------------------------- #
+# add an athlete to the credentials database
+def addCredentials(athleteId, email, pwHash, salt):
+    try:
+        collection_name = getCollection(CREDENTIALS_COLLECTION)
+        newCreds = {
+            "_id" : athleteId,
+            "email" : email,
+            "pwHash" : pwHash,
+            "salt" : salt
+            }
+        result = collection_name.insert_one(newCreds)
+        return result.inserted_id
+    except Exception as e:
+        print(str(e))
+        return None
+
+
+def getCredentials(email):
+    try:
+        collection_name = getCollection(CREDENTIALS_COLLECTION)
+        result = collection_name.find_one({'email' : email})
+        return result
+    except Exception as e:
+        print(str(e))
+        return None
+
 
 
 # ------------------------------------------------------------------- #
@@ -265,6 +294,20 @@ if __name__ == "__main__":
         'test' : False
     }
 
+    # pwPlain = b"sugmaLigma"
+    # salt = bcrypt.gensalt()
+    # hashed = bcrypt.hashpw(pwPlain, salt)
+    # addCredentials(69,"hjv@princeton.edu", hashed, salt)
+
+    pwPlain = b'admin'
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwPlain, salt)
+    addCredentials(420, 'a@x.com', hashed, salt)
+
+
+    creds = getCredentials('hjv@princeton.edu')
+    print(creds)
+    print(bcrypt.checkpw(b'sugmaLigma', creds['pwHash']))
 
     for a in getAllAthletes(sort_by='class'):
         pprint(a)
