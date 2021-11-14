@@ -8,16 +8,23 @@ import urllib3
 import database as db
 import random
 import bcrypt
-import secret
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 TEMPLATE_DIR = './templates'
 STATIC_DIR = './static'
 
+
+if 'secret_key' not in os.environ:
+    from dotenv import load_dotenv
+    load_dotenv()
+    secret_key = os.environ.get('secret_key')
+else:
+    secret_key = os.environ['secret_key']
+
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
 
-app.secret_key = secret.secret_key
+app.secret_key = secret_key
 app.config['SECRET_KEY'] = app.secret_key
 
 login_manager = flask_login.LoginManager()
