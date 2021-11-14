@@ -52,13 +52,14 @@ def xlsxRead(filename):
 
 
 # --------------------------------------------------------------------------------------#
-def xlsxWrite():
+def xlsxBlank():
     """ Creates a blank .xlsx file of the format compatible to be read
         by the method above. Sheet1 is the blank sheet, Sheet2 is the 
         roster pulled from the database
     """
     # create the workbook
-    workbook = xlsxwriter.Workbook('blank.xlsx')
+    staticpath = './static'
+    workbook = xlsxwriter.Workbook(staticpath + 'blank.xlsx')
     worksheet = workbook.add_worksheet() # sheet for scores
     worksheet1 = workbook.add_worksheet() # roster sheet
     bold = workbook.add_format({'bold' : True})
@@ -88,6 +89,8 @@ def xlsxWrite():
         worksheet1.write_row(cell, nameRow)
         ind +=1
 
+    workbook
+
     workbook.close()
 
     return
@@ -97,4 +100,4 @@ def xlsxWrite():
 # test code
 if __name__ == "__main__":
     pprint((xlsxRead('test2.xlsx')))
-    xlsxWrite()
+    xlsxBlank()

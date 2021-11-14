@@ -35,10 +35,55 @@ class User(flask_login.UserMixin):
     pass
 
 
+@login_manager.user_loader
+def user_loader(email):
+    creds = db.getCredentials(email)
+    if not creds:
+        return
+
+    user = User()
+    user.id = creds['_id']
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+    print(request.headers)
+    email = request.cookies.get('email')
+    if not email:
+        return
+
+    creds = db.getCredentials(email)
+
+    user = User()
+    user.id = creds['_id']
+    
+
+    return user
+
+
+# ---------------------------------------------------
+
+
 @app.route('/', methods=['GET'])
 def index():
     html = render_template('index.html')
     return make_response(html)
+
+@flask_login.login_required
+@app.route('/home', methods=['GET'])
+def home():
+    user = flask_login.current_user
+    athlete = db.queryAthlete(user.id)
+    html = render_template('home.html', perms=athlete['permissions'])
+    return make_response(html)
+
+
+@app.route('/download')
+def download
+
+
+
 # ---------------------------------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -59,7 +104,8 @@ def login():
             error = 'Missing Credentials. Please try again.'
         # else check password hash
         else:
-            user = user_loader(email)   
+            user = user_loader(email) 
+
             email = creds['email']
             pwHash = creds['pwHash']
             salt = creds['salt']
@@ -68,7 +114,9 @@ def login():
             if verified:
                 flask_login.login_user(user)
                 session.permanent = False
-                return redirect('/workouts')
+                res = redirect('/home')
+                res.set_cookie('email', email)
+                return res
             else:
                 error = 'Invalid Credentials. Please try again.'
             
@@ -77,32 +125,7 @@ def login():
     return render_template('login.html', error=error)
 
 
-@login_manager.user_loader
-def user_loader(email):
-    creds = db.getCredentials(email)
-    if not creds:
-        return
 
-    user = User()
-    user.id = creds['_id']
-    return user
-
-
-@login_manager.request_loader
-def request_loader(request):
-    email = request.form.get('email')
-    if not email:
-        return
-
-    creds = db.getCredentials(email)
-
-    user = User()
-    user.id = creds['_id']
-    
-    password = bytes(request.form['password'], 'utf-8')
-    user.is_authenticated = bcrypt.checkpw(password, creds['pwhash'])
-
-    return user
 #-----------------------------------------------------------------------
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -158,7 +181,8 @@ def signup():
             if not add:
                 error = "failed to add user"
 
-            return()
+            html = render_template('home.html')
+            return make_response(html)
 
 
 
