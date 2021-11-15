@@ -80,7 +80,8 @@ def home():
 
 
 @app.route('/download')
-def download
+def download():
+    return NotImplemented
 
 
 
