@@ -73,7 +73,8 @@ def index():
 @flask_login.login_required
 @app.route('/home', methods=['GET'])
 def home():
-    user = flask_login.current_user
+    email = request.cookies.get('email')
+    user = user_loader(email)
     athlete = db.queryAthlete(user.id)
     html = render_template('home.html', perms=athlete['permissions'])
     return make_response(html)
