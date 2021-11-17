@@ -8,6 +8,9 @@ import urllib3
 import database as db
 import random
 import bcrypt
+import xlsxMethods
+from io import StringIO
+import datetime
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -93,11 +96,37 @@ def home():
 """ download a blank .xlsx file for recording a workout """
 @app.route('/download')
 def download():
-    return NotImplemented
+    try:
+        blankOutput = xlsxMethods.xlsxBlank()
+        response = Response()
+        response.data = blankOutput.read()
+        response.status_code = 200
+        filename = 'workout_{}.xlsx'.format(datetime.now().strftime('%d/%m/%Y'))
+        mimetype_tuple = mimetypes.guess_type(file_name)
+        response_headers = Headers({
+            'Pragma': "public",  # required,
+            'Expires': '0',
+            'Cache-Control': 'must-revalidate, post-check=0, pre-check=0',
+            'Cache-Control': 'private',  # required for certain browsers,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition': 'attachment; filename=\"%s\";' % file_name,
+            'Content-Transfer-Encoding': 'binary',
+            'Content-Length': len(response.data)
+        })
+
+        if not mimetype_tuple[1] is None:
+            response.update({
+                'Content-Encoding': mimetype_tuple[1]
+            })
+        response.headers = response_headers
+        response.set_cookie('fileDownload', 'true', path='/')
+        return response
+    except Exception as e:
+        print(e)
 
 """ upload a .xlsx file for processing and storing in database """
 @app.route('/upload')
-def download():
+def upload():
     return NotImplemented
 
 #-----------------------------------------------------------------------
@@ -267,7 +296,6 @@ def workout():
 
     html = render_template('workout_dropdown.html' , workout=workout, scores=scores, athletes=athletes)
     return make_response(html)
-
 
 
 

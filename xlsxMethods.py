@@ -4,6 +4,7 @@ import pandas as pd
 import database as db
 from helpers import autoTitle
 from pprint import pprint
+from io import StringIO
 
 
 def xlsxRead(filename):
@@ -57,11 +58,13 @@ def xlsxBlank():
         by the method above. Sheet1 is the blank sheet, Sheet2 is the 
         roster pulled from the database
     """
+
+    output = StringIO()
+
     # create the workbook
-    staticpath = './static'
-    workbook = xlsxwriter.Workbook(staticpath + 'blank.xlsx')
-    worksheet = workbook.add_worksheet() # sheet for scores
-    worksheet1 = workbook.add_worksheet() # roster sheet
+    workbook = xlsxwriter.Workbook(output, {'in_memory' : True})
+    worksheet = workbook.add_worksheet('scores') # sheet for scores
+    worksheet1 = workbook.add_worksheet('roster') # roster sheet
     bold = workbook.add_format({'bold' : True})
 
     # score sheet header info
@@ -81,19 +84,20 @@ def xlsxBlank():
         worksheet.write_formula(cell, formula)
 
     # write in the athletes
-    ind = 1
-    athletes = db.getAllAthletes(active_only=True)
-    for a in athletes:
-        nameRow = [a['last'], a['first']]
-        cell = 'A' + str(ind)
-        worksheet1.write_row(cell, nameRow)
-        ind +=1
+    
+    try:
+        athletes = db.getAllAthletes(active_only=True)
+        for ind, a in enumerate(athletes):
+            nameRow = [a['last'], a['first']]
+            cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
+            worksheet1.write_row(cell, nameRow)
+            workbook.close()
+    except expression as e:
+        print(str(e))
+        workbook.close()
 
-    workbook
-
-    workbook.close()
-
-    return
+    output.seek(0)
+    return output
 
 # --------------------------------------------------------------------------------------#
 
