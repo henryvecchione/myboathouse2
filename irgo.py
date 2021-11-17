@@ -91,6 +91,14 @@ def download():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error=''
+
+    email = request.cookies.get('email')
+    if email:
+        user = user_loader(email)
+        athlete = db.queryAthlete(user.id)
+        return redirect('/home')
+
+
     if request.method == 'POST':
 
         email = request.form['username']
