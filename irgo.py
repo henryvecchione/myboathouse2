@@ -97,7 +97,7 @@ def download():
 
 """ upload a .xlsx file for processing and storing in database """
 @app.route('/upload')
-def download():
+def upload():
     return NotImplemented
 
 #-----------------------------------------------------------------------
