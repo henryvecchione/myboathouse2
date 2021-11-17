@@ -194,17 +194,19 @@ def signup():
 
 
 #-----------------------------------------------------------------------
-@app.route('/workouts', methods=['GET'])
 @flask_login.login_required
+@app.route('/workouts', methods=['GET'])
 def workouts():
+    email = request.cookies.get('email')
+    user = user_loader(email)
 
     workouts = db.getAllWorkouts()
 
     html = render_template('workouts.html' ,workouts=workouts)
     return make_response(html)
 
-@app.route('/workout', methods=['GET'])
 @flask_login.login_required
+@app.route('/workout', methods=['GET'])
 def workout():
     workoutId = request.args.get('w')
     workout = db.queryWorkout(workoutId)
