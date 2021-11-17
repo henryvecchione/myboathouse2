@@ -34,7 +34,11 @@ login_manager.init_app(app)
 class User(flask_login.UserMixin):
     pass
 
+#-----------------------------------------------------------------------
+""" flask_login methods """
+#-----------------------------------------------------------------------
 
+""" loads a user from the database, using their email as the key """
 @login_manager.user_loader
 def user_loader(email):
     creds = db.getCredentials(email)
@@ -43,9 +47,10 @@ def user_loader(email):
 
     user = User()
     user.id = creds['_id']
+
     return user
 
-
+""" loads the user using the 'email' cookie set during login"""
 @login_manager.request_loader
 def request_loader(request):
     print(request.headers)
@@ -54,22 +59,23 @@ def request_loader(request):
         return
 
     creds = db.getCredentials(email)
-
     user = User()
     user.id = creds['_id']
     
-
     return user
 
 
-# ---------------------------------------------------
+#-----------------------------------------------------------------------
+""" Static page rendering """
+#-----------------------------------------------------------------------
 
-
+""" renders the index page """
 @app.route('/', methods=['GET'])
 def index():
     html = render_template('index.html')
     return make_response(html)
 
+""" renders the home page """
 @flask_login.login_required
 @app.route('/home', methods=['GET'])
 def home():
@@ -80,32 +86,45 @@ def home():
     return make_response(html)
 
 
+#-----------------------------------------------------------------------
+""" File upload and download methods """
+#-----------------------------------------------------------------------
+
+""" download a blank .xlsx file for recording a workout """
 @app.route('/download')
 def download():
     return NotImplemented
 
+""" upload a .xlsx file for processing and storing in database """
+@app.route('/upload')
+def download():
+    return NotImplemented
 
+#-----------------------------------------------------------------------
+""" Authentication methods """
+#-----------------------------------------------------------------------
 
-# ---------------------------------------------------
-
+""" renders the login page and processes user logins"""
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error=''
 
+    # if the user has already logged in (and has not logged out)
+    # sign them in
     email = request.cookies.get('email')
     if email:
         user = user_loader(email)
         athlete = db.queryAthlete(user.id)
         return redirect('/home')
 
-
+    # on form submission (POST request)
     if request.method == 'POST':
 
+        # get email and password from form
         email = request.form['username']
         password = bytes(request.form['password'],'utf-8')
-
+        # get the credentials 
         creds = db.getCredentials(email)
-
 
         session.clear()
 
@@ -114,14 +133,14 @@ def login():
             error = 'Missing Credentials. Please try again.'
         # else check password hash
         else:
-            user = user_loader(email) 
 
             email = creds['email']
             pwHash = creds['pwHash']
             salt = creds['salt']
-
+            # check the entered password against that in database
             verified = bcrypt.checkpw(password, pwHash)
             if verified:
+                user = user_loader(email)
                 flask_login.login_user(user)
                 session.permanent = False
                 res = redirect('/home')
@@ -129,33 +148,28 @@ def login():
                 return res
             else:
                 error = 'Invalid Credentials. Please try again.'
-            
-
 
     return render_template('login.html', error=error)
 
-
-
-#-----------------------------------------------------------------------
+""" log out the user """
 @flask_login.login_required
 @app.route('/logout')
 def logout():
     flask_login.logout_user()
     res = redirect('/')
+    # set the email cookie to empty, make it expire 
     res.set_cookie('email', '', expires=0)
     return res
 
 
-#-----------------------------------------------------------------------
-
+""" sign up a new user """
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 
     error = ''
-
+    # on form submission
     if request.method =='POST':
-        for k in request.form.keys():
-            print(k)
+        # get form inputs 
         first = request.form['first']
         last = request.form['last']
         email = request.form['username']
@@ -166,15 +180,19 @@ def signup():
         salt = bcrypt.gensalt()
         pwhash = bcrypt.hashpw(password, salt)
 
+        # check if this email is already in database
         checkIfNew = db.getCredentials(email)
         if checkIfNew:
             error = 'Account already exists with this email'
         else:
+            # TODO: ensure noncollision in assigning IDs
             newId = random.randint(10, 100000)
+            # add the login credentials to credentials DB
             add = db.addCredentials(newId, email, pwhash, salt)
             if not add:
                 error = 'failed to add user'
 
+            # create athlete document from entered info
             athlete = {
                 "_id" : newId,
                 "first" : first,
@@ -195,7 +213,7 @@ def signup():
                 },
                 "teamId" : 1
             }
-
+            # add athlete document to athlete db
             add = db.addAthlete(athlete)
             if not add:
                 error = "failed to add user"
@@ -204,16 +222,18 @@ def signup():
             return make_response(html)
 
 
-
     html = render_template('signup.html', error=error)
     return make_response(html)
 
-
-
 #-----------------------------------------------------------------------
+""" data-based page rendering """
+#-----------------------------------------------------------------------
+
+""" display all workouts """
 @flask_login.login_required
 @app.route('/workouts', methods=['GET'])
 def workouts():
+    # load the user
     email = request.cookies.get('email')
     user = user_loader(email)
 
@@ -222,9 +242,14 @@ def workouts():
     html = render_template('workouts.html' ,workouts=workouts)
     return make_response(html)
 
+""" display a single workout """
 @flask_login.login_required
 @app.route('/workout', methods=['GET'])
 def workout():
+    # load the user 
+    email = request.cookies.get('email')
+    user = user_loader(email)
+
     workoutId = request.args.get('w')
     workout = db.queryWorkout(workoutId)
 
@@ -246,9 +271,9 @@ def workout():
 
 
 
-
 #-----------------------------------------------------------------------
-
+""" other and testing """
+#-----------------------------------------------------------------------
 
 @app.route('/allWorkouts', methods=['GET'])
 def allWorkouts():
