@@ -137,11 +137,21 @@ def login():
 
 
 #-----------------------------------------------------------------------
+@flask_login.login_required
+@app.route('/logout')
+def logout():
+    flask_login.logout_user()
+    res = redirect('/')
+    res.set_cookie('email', '', expires=0)
+    return res
+
+
+#-----------------------------------------------------------------------
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 
-    error =''
+    error = ''
 
     if request.method =='POST':
         for k in request.form.keys():
@@ -153,7 +163,6 @@ def signup():
         classYr = request.form['class']
         side = request.form['side']
 
-        
         salt = bcrypt.gensalt()
         pwhash = bcrypt.hashpw(password, salt)
 
