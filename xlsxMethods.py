@@ -4,7 +4,7 @@ import pandas as pd
 import database as db
 from helpers import autoTitle
 from pprint import pprint
-from io import StringIO
+from io import StringIO, BytesIO
 
 
 def xlsxRead(filename):
@@ -34,12 +34,14 @@ def xlsxRead(filename):
         col = data[i]
         first = col['MyBoathouse'].capitalize()
         last = col['Piece:'].capitalize()
-        athleteId = db.queryAthleteByName(first, last)['_id']
+        athleteId = str(db.queryAthleteByName(first, last)['_id'])
         scores = []
         for piece in pieces:
             scores.append(str(col[piece]))
         scoresDict[athleteId] = scores
+        nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1
     workoutDict = {
+        '_id' : nextId,
         'title' : ', '.join(pieces),
         'date' : date,
         'pieces' : pieces,
@@ -59,7 +61,7 @@ def xlsxBlank():
         roster pulled from the database
     """
 
-    output = StringIO()
+    output = BytesIO()
 
     # create the workbook
     workbook = xlsxwriter.Workbook(output, {'in_memory' : True})
@@ -80,7 +82,7 @@ def xlsxBlank():
     # write the vlookup formula that fills names from the roser
     for i in range(4, 50):
         cell = 'A' + str(i)
-        formula = '=IF(B{}<>"",VLOOKUP(B{},Sheet2!A:B,2,FALSE), "")'.format(str(i),str(i))
+        formula = '=IF(B{}<>"",VLOOKUP(B{},roster!A:B,2,FALSE), "")'.format(str(i),str(i))
         worksheet.write_formula(cell, formula)
 
     # write in the athletes
@@ -88,11 +90,13 @@ def xlsxBlank():
     try:
         athletes = db.getAllAthletes(active_only=True)
         for ind, a in enumerate(athletes):
+            print(ind)
             nameRow = [a['last'], a['first']]
             cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
+            # print('writing ' + nameRow + ' to ' + cell)
             worksheet1.write_row(cell, nameRow)
-            workbook.close()
-    except expression as e:
+        workbook.close()
+    except Exception as e:
         print(str(e))
         workbook.close()
 

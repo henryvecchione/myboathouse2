@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, redirect, url_for
+from flask import Flask, request, make_response, redirect, url_for, Response
 from flask import render_template, Markup, flash, session, jsonify, abort
 from werkzeug.security import generate_password_hash, check_password_hash, gen_salt
 import flask_login
@@ -10,7 +10,8 @@ import random
 import bcrypt
 import xlsxMethods
 from io import StringIO
-import datetime
+from datetime import datetime
+import mimetypes
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -101,9 +102,9 @@ def download():
         response = Response()
         response.data = blankOutput.read()
         response.status_code = 200
-        filename = 'workout_{}.xlsx'.format(datetime.now().strftime('%d/%m/%Y'))
+        file_name = 'workout_{}.xlsx'.format(datetime.now().strftime('%d/%m/%Y'))
         mimetype_tuple = mimetypes.guess_type(file_name)
-        response_headers = Headers({
+        headers = {
             'Pragma': "public",  # required,
             'Expires': '0',
             'Cache-Control': 'must-revalidate, post-check=0, pre-check=0',
@@ -112,22 +113,37 @@ def download():
             'Content-Disposition': 'attachment; filename=\"%s\";' % file_name,
             'Content-Transfer-Encoding': 'binary',
             'Content-Length': len(response.data)
-        })
+        }
+
+        for k in headers:
+            response.headers[k] = headers[k]
 
         if not mimetype_tuple[1] is None:
             response.update({
                 'Content-Encoding': mimetype_tuple[1]
             })
-        response.headers = response_headers
         response.set_cookie('fileDownload', 'true', path='/')
         return response
     except Exception as e:
-        print(e)
+        print(e, 'sugma')
 
 """ upload a .xlsx file for processing and storing in database """
-@app.route('/upload')
+@app.route('/upload', methods=['POST'])
 def upload():
-    return NotImplemented
+    file = request.files['sheet']
+    try:
+        workout = xlsxMethods.xlsxRead(file)
+        add = db.addWorkout(workout)
+        if not add:
+            flash("failed to add workout")
+            return redirect('/home')
+        else:
+            return redirect('workout?w={}'.format(add))
+    except Exception as e:
+        print(str(e), ' in upload')
+        return redirect('/home')
+
+    
 
 #-----------------------------------------------------------------------
 """ Authentication methods """
@@ -199,8 +215,8 @@ def signup():
     # on form submission
     if request.method =='POST':
         # get form inputs 
-        first = request.form['first']
-        last = request.form['last']
+        first = request.form['first'].capitalize()
+        last = request.form['last'].capitalize()
         email = request.form['username']
         password = bytes(request.form['password'], 'utf-8')
         classYr = request.form['class']
@@ -222,11 +238,15 @@ def signup():
                 error = 'failed to add user'
 
             # create athlete document from entered info
+            if side == 'cox':
+                permissions = ['cox']
+            else:
+                permissions = []
             athlete = {
                 "_id" : newId,
                 "first" : first,
                 "last" : last,
-                "permissions" : [],
+                "permissions" : permissions,
                 "prs" : {
                     "2000m" : '-1',
                     "6000m" : '-1'

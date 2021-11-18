@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
         <title>ActiveTracks</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.slim.js"   integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY="   crossorigin="anonymous"></script>
     </head>
     <body>
         <div class="container-fluid">
@@ -48,11 +49,34 @@
                         {% if 'cox' in perms or 'admin' in perms %}
                         <div class="row">
                             <div class="col card text-center" style="margin: 1rem;">
-                                <h3>Upload</h3>
+                                <h3>Upload workout</h3>
                                     <p>
                                         Upload a workout to the database
                                     </p>
-                                    <a href="/workouts" class="btn btn-primary" style="margin: 1rem;">Go</a>
+                                    {% if 'admin' not in perms %}
+                                    <div class="row">
+                                        <div class="col" style="margin: 1rem;">
+                                            <a href="/download" class="btn btn-secondary btn-block" >Download blank sheet</a>
+                                        </div>
+                                        <div class="col" style="margin: 1rem;">
+                                            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload">
+                                                <input type="file" name="sheet" id="file" class="btn btn-primary btn-block"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if 'admin' in perms %}
+                                        <div class="row" style="margin: 1rem;">
+                                            <a href="/download" class="btn btn-secondary btn-block" >Download blank sheet</a>
+                                        </div>
+                                        <div class="row" style="margin: 1rem;">
+                                            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload">
+                                                <input type="file" name="sheet" id="file" class="btn btn-primary btn-block"/>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    
                             </div>
                             {% if 'admin' in perms %}
                             <div class="col card text-center" style="margin: 1rem;">
@@ -75,7 +99,12 @@
 
         </div>
 
-
+        <script>
+            $("#file").change(function () {
+            $("#upload").submit();
+            });
+        </script>
+        
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>     
     </body>
