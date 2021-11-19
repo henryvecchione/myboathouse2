@@ -5,6 +5,8 @@ import database as db
 from helpers import autoTitle
 from pprint import pprint
 from io import StringIO, BytesIO
+from structures import Workout, Piece
+import datetime
 
 
 def xlsxRead(filename):
@@ -37,9 +39,21 @@ def xlsxRead(filename):
         athleteId = str(db.queryAthleteByName(first, last)['_id'])
         scores = []
         for piece in pieces:
+            if 'm' in piece.strip():
+                try:
+                    meters = int(piece.strip()[:-1])
+                except:
+                    print('xlsxMethods: could not parse meters from sheet')
+                    return None
+                else:
+                    t = str(col[piece]).split(':')
+                    time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
+                    print((time), '***')
             scores.append(str(col[piece]))
         scoresDict[athleteId] = scores
-        nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1
+        
+
+    nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1 # increment _id
     workoutDict = {
         '_id' : nextId,
         'title' : ', '.join(pieces),
@@ -90,7 +104,6 @@ def xlsxBlank():
     try:
         athletes = db.getAllAthletes(active_only=True)
         for ind, a in enumerate(athletes):
-            print(ind)
             nameRow = [a['last'], a['first']]
             cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
             # print('writing ' + nameRow + ' to ' + cell)
