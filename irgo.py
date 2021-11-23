@@ -57,7 +57,6 @@ def user_loader(email):
 """ loads the user using the 'email' cookie set during login"""
 @login_manager.request_loader
 def request_loader(request):
-    print(request.headers)
     email = request.cookies.get('email')
     if not email:
         return
@@ -303,10 +302,9 @@ def workout():
     workout = db.queryWorkout(workoutId)
 
     scores = workout['scores']
-    print(scores)
-    athleteIds = scores.keys()
     athletes = {}
-    for athleteId in athleteIds:
+    for score in scores:
+        athleteId = score.athleteId
         ath = db.queryAthlete(athleteId)
         athletes[athleteId] = {
             'first' : ath['first'],

@@ -4,6 +4,8 @@ import datetime
 from pprint import pprint
 import os 
 import bcrypt
+import pickle
+
 
 if 'database_url' not in os.environ:
     from dotenv import load_dotenv
@@ -85,6 +87,7 @@ def getAllAthletes(sort_by='name', active_only=False):
 
 def addWorkout(workoutDict):
     try:
+        print(workoutDict)
         collection_name = getCollection(WORKOUT_COLLECTION)
         result = collection_name.insert_one(workoutDict)
         return result.inserted_id
@@ -105,7 +108,10 @@ def queryWorkout(workoutId):
     try:
         workoutId = int(workoutId)
         collection_name = getCollection(WORKOUT_COLLECTION)
-        return collection_name.find_one({'_id' : workoutId})
+        res = collection_name.find_one({'_id' : workoutId})
+        temp = pickle.loads(res['scores'])
+        res['scores'] = temp
+        return res
     except Exception as e:
         print(str(e))
         return None

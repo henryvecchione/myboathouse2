@@ -7,6 +7,8 @@ from pprint import pprint
 from io import StringIO, BytesIO
 from structures import Workout, Piece
 import datetime
+from bson.binary import Binary
+import pickle
 
 
 def xlsxRead(filename):
@@ -26,7 +28,6 @@ def xlsxRead(filename):
     #     if '.' in pieces[i]:
     #         pieces[i] = pieces[i].split('.')[0]
     notes = list(note for note in data[0][2:] if note) # all non-empty notes
-    print(pieces)
 
     # parse the scores
     workoutList = []
@@ -66,12 +67,14 @@ def xlsxRead(filename):
         
 
     nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1 # increment _id
+    workoutListBytes = pickle.dumps(workoutList)
+
     workoutDict = {
         '_id' : nextId,
         'title' : ', '.join(str(p) for p in pieces),
         'date' : date,
-        'pieces' : pieces,
-        'scores' : workoutList,
+        'pieces' : [str(p) for p in pieces],
+        'scores' : Binary(workoutListBytes),
         'notes' : notes
     }
 
