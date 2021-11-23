@@ -22,47 +22,58 @@ def xlsxRead(filename):
     # parse the date and pieces
     date = data[0]['MyBoathouse']
     pieces = list(data.index)[2:]
-    for i in range(len(pieces)):
-        if '.' in pieces[i]:
-            pieces[i] = pieces[i].split('.')[0]
+    # for i in range(len(pieces)):
+    #     if '.' in pieces[i]:
+    #         pieces[i] = pieces[i].split('.')[0]
     notes = list(note for note in data[0][2:] if note) # all non-empty notes
+    print(pieces)
 
     # parse the scores
-    scoresDict = {}
+    workoutList = []
     for i in data.keys():
         if i < 2:
             continue
         # this isn't obvious but necessitated by structure of sheet
         col = data[i]
+        # first and last name of athlete
         first = col['MyBoathouse'].capitalize()
         last = col['Piece:'].capitalize()
         athleteId = str(db.queryAthleteByName(first, last)['_id'])
+
         scores = []
         for piece in pieces:
-            if 'm' in piece.strip():
-                try:
-                    meters = int(piece.strip()[:-1])
-                except:
-                    print('xlsxMethods: could not parse meters from sheet')
-                    return None
-                else:
+            try:    
+                if isinstance(piece, int):
                     t = str(col[piece]).split(':')
                     time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
-                    print((time), '***')
-            scores.append(str(col[piece]))
-        scoresDict[athleteId] = scores
+                    p = Piece(piece, time)
+                    scores.append(p)
+                elif isinstance(piece, datetime.time):
+                    meters = int(col[piece])
+                    time = datetime.time(minute=piece.hour, second=piece.minute)
+                    p = Piece(meters, time)
+                    scores.append(p)
+                else:
+                    print("Distance/time mismatch")
+                    return None
+            except TypeError as e:
+                print(str(e))
+                print("Distance/Time mismatch")
+                return None
+                
+        workout = Workout(athleteId, scores)
+        workoutList.append(workout)
         
 
     nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1 # increment _id
     workoutDict = {
         '_id' : nextId,
-        'title' : ', '.join(pieces),
+        'title' : ', '.join(str(p) for p in pieces),
         'date' : date,
         'pieces' : pieces,
-        'scores' : scoresDict,
+        'scores' : workoutList,
         'notes' : notes
     }
-
 
     return workoutDict
 
@@ -100,13 +111,11 @@ def xlsxBlank():
         worksheet.write_formula(cell, formula)
 
     # write in the athletes
-    
     try:
         athletes = db.getAllAthletes(active_only=True)
         for ind, a in enumerate(athletes):
             nameRow = [a['last'], a['first']]
             cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
-            # print('writing ' + nameRow + ' to ' + cell)
             worksheet1.write_row(cell, nameRow)
         workbook.close()
     except Exception as e:

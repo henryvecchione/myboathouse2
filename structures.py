@@ -1,6 +1,6 @@
 # structures.py
 import datetime
-from helpers import averageOfOne, averageOfAll
+from helpers import averageOfOne, averageOfAll, autoTitle
 
 class Workout:
     """ an individual athlete's workout. Composed of an athlete's ID (int) and 
@@ -16,6 +16,10 @@ class Workout:
     def addPiece(self, piece):
         self.scores.append(piece)
 
+    def __str__(self):
+        s = f'Workout({self.athleteId}, {self.scores}, {self.split})'
+        return s
+
 
 class Piece:
     """ a single unit of erging, e.g. a 2000m or 5:00 piece. """ 
@@ -26,3 +30,8 @@ class Piece:
             self.split = averageOfOne(meters, time)
         except Exception as e:
             print(str(e), ': in Piece. Is the time a datetime.time?')
+
+
+    def __str__(self):
+        s = f"Piece({self.meters}m , {self.time}, {self.split})"
+        return s
