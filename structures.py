@@ -26,8 +26,8 @@ class Piece:
     def __init__(self, meters, time):
         try:
             self.meters = meters
-            self.time = time
-            self.split = averageOfOne(meters, time)
+            self.time = datetime.datetime.combine(datetime.date(2000, 2, 26), time)
+            self.split = datetime.datetime.combine(datetime.date(2000, 2, 26), averageOfOne(meters, time))
         except Exception as e:
             print(str(e), ': in Piece. Is the time a datetime.time?')
 
