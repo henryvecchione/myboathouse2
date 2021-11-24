@@ -5,13 +5,14 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <title>ActiveTracks</title>
     </head>
     <body>
         <div class="container-fluid">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                <a class="navbar-brand" href="/"><h1><em>irgo</em></h1></a>
+                <a class="navbar-brand" href="/home"><h1><em>irgo</em></h1></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -26,12 +27,20 @@
                 </div>
             </nav>
 
-            <div class="card" style="width: 100%;">
+            <div class="card" style="width: 100%; ">
                 <div class="card-body">
                     <h3>{{workout['title']}}</h3>
-                    <h5>{{workout['date']}}</h5>
-                    <div style="overflow-x: scroll;">
-                        <table class="table">
+                    <div class="row" style="margin-bottom: 1rem;">
+                        <div class="col-8">
+                            <h5>{{workout['date']}}</h5>
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-secondary btn-block"  id="toggleSplit">Raw/Split</button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: scroll;" >
+                        <table class="table" id="times" style="visibility: visible;">
                             <thead>
                               <tr>
                                 <th scope="col">#</th>
@@ -44,26 +53,67 @@
                             </thead>
                             <tbody>
                             {% for id in scores %}
+                                {% set athleteId = id[0] %}
+                                {% set avg = id[1][0] %}
+                                {% set pieces = id[1][1] %}
                                 <tr>
                                     <th scope="row">{{loop.index}}</th>
-                                    <td>{{athletes[id]['first']}} {{athletes[id]['last']}} </td>
-                                    <td>TODO</td>
-                                    {% for score in scores[id] %}
-                                        <td>{{score}}</td>
-                                    {% endfor %}
+                                    <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
+                                    <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
+                                        {% for piece in pieces %}
+                                            <td>{{piece.score(as_string=True)[0]}}</td>
+                                        {% endfor %}
+                                    </div>
                                 </tr>
                             {% endfor %}
-
-                              
                             </tbody>
-                          </table>
-                    </div>
-                    
+                        </table>
+
+                        
+                    <table class="table" id="splits" style="display: none;">
+                        <thead>
+                            <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Average</th>
+                            {% for piece in workout['pieces'] %}
+                            <th scope="col">{{piece}}</th>
+                            {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for id in scores %}
+                            {% set athleteId = id[0] %}
+                            {% set avg = id[1][0] %}
+                            {% set pieces = id[1][1] %}
+                            <tr>
+                                <th scope="row">{{loop.index}}</th>
+                                <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
+                                <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
+                                    {% for piece in pieces %}
+                                        <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+                                    {% endfor %}
+                                </div>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                    </table>
                 </div>
+                    
             </div>
-
-
         </div>
+
+
+
+        <script>
+            $(document).ready(function(){
+              $("#toggleSplit").click(function(){
+                $("#splits").toggle();
+                $("#times").toggle();
+              });
+            });
+        </script>
 
 
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>

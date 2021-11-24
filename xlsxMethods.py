@@ -23,10 +23,10 @@ def xlsxRead(filename):
 
     # parse the date and pieces
     date = data[0]['MyBoathouse']
+    if 'Y' in date or 'M' in date or 'D' in date:
+        date = datetime.datetime.now()
     pieces = list(data.index)[2:]
-    # for i in range(len(pieces)):
-    #     if '.' in pieces[i]:
-    #         pieces[i] = pieces[i].split('.')[0]
+
     notes = list(note for note in data[0][2:] if note) # all non-empty notes
 
     # parse the scores
@@ -42,17 +42,28 @@ def xlsxRead(filename):
         athleteId = str(db.queryAthleteByName(first, last)['_id'])
 
         scores = []
+
         for piece in pieces:
-            try:    
+            try:
+                # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
                     t = str(col[piece]).split(':')
                     time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
-                    p = Piece(piece, time)
+                    p = Piece(piece, time, True)
                     scores.append(p)
+                # else if its a datetime, make a time piece
                 elif isinstance(piece, datetime.time):
                     meters = int(col[piece])
                     time = datetime.time(minute=piece.hour, second=piece.minute)
-                    p = Piece(meters, time)
+                    p = Piece(meters, time, False)
+                    scores.append(p)
+                # read_excel, if there are duplicate col headers, appends a .X, e.g 2000, 2000.1, 2000.2... 
+                # trim this off, make it an int
+                elif '.' in piece:
+                    meters = int(piece.split('.')[0])
+                    t = str(col[piece]).split(':')
+                    time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
+                    p = Piece(meters, time, True)
                     scores.append(p)
                 else:
                     print("Distance/time mismatch")
@@ -98,10 +109,10 @@ def xlsxBlank():
     bold = workbook.add_format({'bold' : True})
 
     # score sheet header info
-    header = ['MyBoathouse', 'Piece:', '(XXXXm | mm:ss)', '(XXXXm | mm:ss)', '(XXXXm | mm:ss)']
+    header = ['MyBoathouse', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
     notes = ['YYYY-MM-DD', 'Notes:']
     firstLast = ['First', 'Last']
-    example = ['(mm:ss | YYYYm)','(mm:ss | YYYYm)','(mm:ss | YYYYm)']
+    example = ['(mm:ss | YYYY)','(mm:ss | YYYY)','(mm:ss | YYYY)']
     worksheet.write_row('A1', header, bold)
     worksheet.write_row('A2', notes, bold)
     worksheet.write_row('A3', firstLast, bold)

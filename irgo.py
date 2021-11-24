@@ -140,6 +140,7 @@ def upload():
             return redirect('workout?w={}'.format(add))
     except Exception as e:
         print(str(e), ' in upload')
+        flash("There was an error uploading the file")
         return redirect('/home')
 
     
@@ -299,20 +300,31 @@ def workout():
     user = user_loader(email)
 
     workoutId = request.args.get('w')
-    workout = db.queryWorkout(workoutId)
+    session = db.queryWorkout(workoutId)
 
-    scores = workout['scores']
+    results = session['scores']
     athletes = {}
-    for score in scores:
-        athleteId = score.athleteId
+    scoresDict = {}
+    averages = {}
+    for workout in results:
+        athleteId = workout.athleteId
         ath = db.queryAthlete(athleteId)
         athletes[athleteId] = {
             'first' : ath['first'],
             'last' : ath['last'],
             'side' : ath['side']
         }
+        scoresDict[athleteId] = workout.split, workout.scores
+        averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
 
-    html = render_template('workout_dropdown.html' , workout=workout, scores=scores, athletes=athletes)
+
+    scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
+
+
+    print(scoresDict_sorted)
+
+
+    html = render_template('workout.html' , workout=session, scores=scoresDict_sorted, athletes=athletes, averages=averages)
     return make_response(html)
 
 
