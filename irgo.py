@@ -221,14 +221,19 @@ def signup():
         password = bytes(request.form['password'], 'utf-8')
         classYr = request.form['class']
         side = request.form['side']
+        team = request.args.get('t')
 
         salt = bcrypt.gensalt()
         pwhash = bcrypt.hashpw(password, salt)
 
         # check if this email is already in database
         checkIfNew = db.getCredentials(email)
+        checkIfTeam = db.queryTeam(team)
+        print(checkIfTeam, 'abababab')
         if checkIfNew:
             error = 'Account already exists with this email'
+        elif not checkIfTeam:
+            error = f'No team exists with id: {team}'
         else:
             # TODO: ensure noncollision in assigning IDs
             newId = random.randint(10, 100000)
@@ -238,10 +243,13 @@ def signup():
                 error = 'failed to add user'
 
             # create athlete document from entered info
+            permissions = []
             if side == 'cox':
-                permissions = ['cox']
-            else:
-                permissions = []
+                permissions.append('cox')
+
+            if 'admin' in request.form.keys():
+                permissions.append('admin')
+
             athlete = {
                 "_id" : newId,
                 "first" : first,
@@ -260,19 +268,37 @@ def signup():
                     "ira" : [],
                     "shirts" : []
                 },
-                "teamId" : 1
+                "teamId" : team
             }
             # add athlete document to athlete db
             add = db.addAthlete(athlete)
             if not add:
                 error = "failed to add user"
 
-            html = render_template('home.html')
+            html = redirect('/home')
             return make_response(html)
-
-
-    html = render_template('signup.html', error=error)
+    teamId = request.args.get('t')
+    if teamId:
+        html = render_template('signup.html', newTeam=True, error=error, teamId=teamId)
+    else:
+        html = render_template('signup.html', newTeam=False, error=error)
     return make_response(html)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = ''
+    if request.method == 'POST':
+        name = request.form['teamName'].capitalize()
+
+        teamId = db.addTeam(name)
+
+        html = render_template('signup.html', newTeam=True, teamId=teamId)
+        return redirect(f'/signup?t={teamId}')
+
+    html = render_template('register.html', error=error)
+    return make_response(html)
+
 
 #-----------------------------------------------------------------------
 """ data-based page rendering """
@@ -285,8 +311,9 @@ def workouts():
     # load the user
     email = request.cookies.get('email')
     user = user_loader(email)
+    athlete = db.queryAthlete(user.id)
 
-    workouts = db.getAllWorkouts()
+    workouts = db.getAllWorkouts(athlete['teamId'])
 
     html = render_template('workouts.html' ,workouts=workouts)
     return make_response(html)

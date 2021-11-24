@@ -5,6 +5,7 @@ from pprint import pprint
 import os 
 import bcrypt
 import pickle
+import random
 
 
 if 'database_url' not in os.environ:
@@ -18,6 +19,7 @@ DBNAME = 'irgo'
 ATHLETE_COLLECTION = 'athletes'
 WORKOUT_COLLECTION = 'workouts'
 CREDENTIALS_COLLECTION = 'credentials'
+TEAMS_COLLECTION = 'teams'
 
 # ------------------------------------------------------------------- #
 # General Database methods
@@ -116,13 +118,40 @@ def queryWorkout(workoutId):
         print(str(e))
         return None
 
-def getAllWorkouts(sort_by='date'):
+def getAllWorkouts(teamId, sort_by='date'):
     try:
         collection_name = getCollection(WORKOUT_COLLECTION)
-        return collection_name.find({}, sort=[(sort_by, pymongo.DESCENDING)])
+        return collection_name.find({'teamId' : teamId}, sort=[(sort_by, pymongo.DESCENDING)])
     except Exception as e:
         print(str(e))
         return None
+
+# ------------------------------------------------------------------ # 
+# general team db methods
+def queryTeam(teamId):
+    try:
+        teamId = int(teamId)
+        collection_name = getCollection(TEAMS_COLLECTION)
+        res = collection_name.find_one({'_id' : teamId})
+        return res
+    except Exception as e:
+        print(str(e))
+        return None
+
+def addTeam(name):
+    try:
+        teamId = random.randint(10, 999999)
+        # ensure no id collision
+        while queryTeam(teamId):
+            teamId = random.randint(10, 999999) 
+
+        collection_name = getCollection(TEAMS_COLLECTION)
+        res = collection_name.insert_one({'_id' : teamId, 'name' : name})
+        return res.inserted_id
+    except Exception as e:
+        print(str(e))
+        return None
+
 # ------------------------------------------------------------------- #
 # takes a workout ID, gets all participating athletes, and adds that 
 # workout to each athlete's 'workouts' array
@@ -317,8 +346,10 @@ if __name__ == "__main__":
 
     for a in getAllAthletes(sort_by='class'):
         pprint(a)
-    for w in getAllWorkouts():
+    for w in getAllWorkouts(1):
         pprint(w)
 
-    for z in getScoreByAthlete(69,2):
-        pprint(z)
+    # for z in getScoreByAthlete(69,2):
+    #     pprint(z)
+
+    pprint(queryTeam(1))

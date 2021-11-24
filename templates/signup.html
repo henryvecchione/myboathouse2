@@ -47,13 +47,13 @@
                             <input type="password" class="form-control" name="password" id="passwordForm" value="{{request.form.password}}" required>
                         </div>
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-group">
                                     <label for="classForm">Class * </label>
                                     <input type="number" id= "classForm" class="form-control" name="class" value="{{request.form.class}}" required>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <div class="form-check">
                                     <label for="sideform">Side * </label>
                                     <div class="btn-group btn-group-toggle btn-block" data-toggle="buttons" id="sideform">
@@ -69,9 +69,27 @@
                                         <label class="btn btn-outline-secondary" for="coxcheck">Coxswain
                                         <input type="radio" name="side" autocomplete="off" value="cox" id="coxcheck" />
                                         </label>
-                                        
+                                    
                                     </div>
                                 </div>
+                            </div>
+                            {% if newTeam %}
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="teamForm">Team * </label>
+                                    <input type="number" id= "teamForm" class="form-control" name="team" value="{{teamId}}" disabled>
+                                </div>
+                            </div>
+                            <input type="hidden" name='admin' value='1'>
+                            {% else %}
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="teamForm">Team * </label>
+                                    <input type="number" id= "teamForm" class="form-control" name="team" value="{{request.form.team}}" required>
+                                </div>
+                            </div>
+                            {% endif %}
+
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Sign up</button>
