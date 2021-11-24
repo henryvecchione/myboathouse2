@@ -25,7 +25,7 @@ def xlsxRead(filename):
     date = data[0]['MyBoathouse']
     if 'Y' in date or 'M' in date or 'D' in date:
         date = datetime.datetime.now()
-    pieces = list(data.index)[2:]
+    pieces = list(data.index)[2:] 
 
     notes = list(note for note in data[0][2:] if note) # all non-empty notes
 
@@ -76,7 +76,7 @@ def xlsxRead(filename):
         workout = Workout(athleteId, scores)
         workoutList.append(workout)
         
-
+    
     nextId = int(db.getAllWorkouts(sort_by='_id')[0]['_id']) + 1 # increment _id
     workoutListBytes = pickle.dumps(workoutList)
 

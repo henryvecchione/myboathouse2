@@ -328,6 +328,16 @@ def workout():
     return make_response(html)
 
 
+@flask_login.login_required
+@app.route('/profile', methods=['GET'])
+def profile():
+    email = request.cookies.get('email')
+    user = user_loader(email)
+    athleteId = user.id
+
+    return NotImplemented
+
+
 
 #-----------------------------------------------------------------------
 """ other and testing """
