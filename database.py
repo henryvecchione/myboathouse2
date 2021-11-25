@@ -73,13 +73,13 @@ def queryAthleteByName(first, last):
         print(str(e))
         return None
 
-def getAllAthletes(sort_by='name', active_only=False):
+def getAllAthletes(teamId, sort_by='name', active_only=False):
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         if active_only:
-            return collection_name.find({'active': True}, sort=[(sort_by, pymongo.ASCENDING)])
+            return collection_name.find({'active': True, 'teamId' : teamId}, sort=[(sort_by, pymongo.ASCENDING)])
         else:
-            return collection_name.find({}, sort=[(sort_by, pymongo.ASCENDING)])
+            return collection_name.find({'teamId' : teamId}, sort=[(sort_by, pymongo.ASCENDING)])
     except Exception as e:
         print(str(e))
         return None
@@ -87,10 +87,11 @@ def getAllAthletes(sort_by='name', active_only=False):
 # ------------------------------------------------------------------- #
 # general workout collection methods 
 
-def addWorkout(workoutDict):
+def addWorkout(workoutDict, teamId):
     try:
         print(workoutDict)
         collection_name = getCollection(WORKOUT_COLLECTION)
+        workoutDict['teamId'] = teamId
         result = collection_name.insert_one(workoutDict)
         return result.inserted_id
     except Exception as e:
@@ -334,17 +335,17 @@ if __name__ == "__main__":
     # hashed = bcrypt.hashpw(pwPlain, salt)
     # addCredentials(69,"hjv@princeton.edu", hashed, salt)
 
-    pwPlain = b'admin'
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(pwPlain, salt)
-    addCredentials(420, 'a@x.com', hashed, salt)
+    # pwPlain = b'admin'
+    # salt = bcrypt.gensalt()
+    # hashed = bcrypt.hashpw(pwPlain, salt)
+    # addCredentials(420, 'a@x.com', hashed, salt)
 
 
-    creds = getCredentials('hjv@princeton.edu')
-    print(creds)
-    print(bcrypt.checkpw(b'sugmaLigma', creds['pwHash']))
+    # creds = getCredentials('hjv@princeton.edu')
+    # print(creds)
+    # print(bcrypt.checkpw(b'sugmaLigma', creds['pwHash']))
 
-    for a in getAllAthletes(sort_by='class'):
+    for a in getAllAthletes(1, sort_by='class'):
         pprint(a)
     for w in getAllWorkouts(1):
         pprint(w)
@@ -352,4 +353,4 @@ if __name__ == "__main__":
     # for z in getScoreByAthlete(69,2):
     #     pprint(z)
 
-    pprint(queryTeam(1))
+    print(editAthlete(69, 'first', 'wiener'))

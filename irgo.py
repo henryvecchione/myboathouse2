@@ -85,7 +85,7 @@ def home():
     email = request.cookies.get('email')
     user = user_loader(email)
     athlete = db.queryAthlete(user.id)
-    html = render_template('home.html', perms=athlete['permissions'])
+    html = render_template('home.html', perms=athlete['permissions'], first=athlete['first'])
     return make_response(html)
 
 
@@ -96,8 +96,13 @@ def home():
 """ download a blank .xlsx file for recording a workout """
 @app.route('/download')
 def download():
+    email = request.cookies.get('email')
+    user = user_loader(email)
+    athleteId = user.id
+    athlete = db.queryAthlete(athleteId)
+    teamId = athlete['teamId']
     try:
-        blankOutput = xlsxMethods.xlsxBlank()
+        blankOutput = xlsxMethods.xlsxBlank(teamId)
         response = Response()
         response.data = blankOutput.read()
         response.status_code = 200
@@ -129,10 +134,16 @@ def download():
 """ upload a .xlsx file for processing and storing in database """
 @app.route('/upload', methods=['POST'])
 def upload():
+    email = request.cookies.get('email')
+    user = user_loader(email)
+    athleteId = user.id
+    athlete = db.queryAthlete(athleteId)
+    teamId = athlete['teamId']
+
     file = request.files['sheet']
     try:
-        workout = xlsxMethods.xlsxRead(file)
-        add = db.addWorkout(workout)
+        workout = xlsxMethods.xlsxRead(file, teamId)
+        add = db.addWorkout(workout, teamId)
         if not add:
             flash("failed to add workout")
             return redirect('/home')
@@ -221,7 +232,10 @@ def signup():
         password = bytes(request.form['password'], 'utf-8')
         classYr = request.form['class']
         side = request.form['side']
+
         team = request.args.get('t')
+        if not team:
+            team = request.form['team']
 
         salt = bcrypt.gensalt()
         pwhash = bcrypt.hashpw(password, salt)
@@ -229,7 +243,6 @@ def signup():
         # check if this email is already in database
         checkIfNew = db.getCredentials(email)
         checkIfTeam = db.queryTeam(team)
-        print(checkIfTeam, 'abababab')
         if checkIfNew:
             error = 'Account already exists with this email'
         elif not checkIfTeam:
@@ -243,7 +256,7 @@ def signup():
                 error = 'failed to add user'
 
             # create athlete document from entered info
-            permissions = []
+            permissions = ['']
             if side == 'cox':
                 permissions.append('cox')
 
@@ -363,6 +376,34 @@ def profile():
     athleteId = user.id
 
     return NotImplemented
+
+@app.route('/team', methods=['GET', 'POST'])
+def team():
+    email = request.cookies.get('email')
+    user = user_loader(email)
+    athleteId = user.id
+    athlete = db.queryAthlete(athleteId)
+    teamId = athlete['teamId']
+    teamName = db.queryTeam(teamId)['name']
+    teammates = db.getAllAthletes(teamId)
+
+    sumModified = 0
+    if request.method == 'POST':
+        for key in list(request.form):
+            field, athleteId = key.split('_')
+            newVal = request.form[key]
+            if field == 'active':
+                sumModified += db.editAthlete(int(athleteId), field, True)
+            else:
+                sumModified += db.editAthlete(int(athleteId), field, newVal)
+
+            if 'active' not in request.form:
+                sumModified += db.editAthlete(int(athleteId), 'active', False)
+
+
+
+    html= render_template('team.html', athletes=teammates, teamName=teamName)
+    return make_response(html)
 
 
 
