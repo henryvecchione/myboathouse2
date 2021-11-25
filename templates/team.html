@@ -76,6 +76,12 @@
                                                     <option value="none" {% if 'admin' not in athlete["permissions"] %} selected {% endif %}>None</option>
                                                 </select>
                                             </td>
+                                            <!-- <td>
+                                                <form action="/delete" method="POST">
+                                                    <input type="hidden" value="{{athlete['_id']}}">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </td> -->
+                                            </form>
 
                                             </div>
                                         </tr>
