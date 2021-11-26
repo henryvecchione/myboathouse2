@@ -5,7 +5,7 @@
 *irgo is based on the original, now defunct MyBoathouse, developed for COS333 by Lucas Manning and others*
 
 ## What it does 
-irgo is a way to keep a rowing team's erg workout data in one place, allowing rowers to compare their scores with others, track their performance over time, and look back on scores from previous years. It also allows coxswains and coaches to easily upload workout data. 
+irgo is a way to keep a rowing team's erg workout data in one place, allowing rowers to compare their scores with others, track performance over time, and look back on scores from previous years. It also allows coxswains and coaches to easily upload workout data. 
 
 ## How to use it 
 ### Logging in, signing up, and registering 
@@ -15,7 +15,7 @@ Navigate to [irgo.herokuapp.com](http://irgo.herokuapp.com). Existing users, sel
 Once an account is signed in, you'll be directed to the /home page. From here, you can navigate to the **/workouts** and **/profile** pages. Coxswains and users with 'admin' permissions can download a template sheet and upload a completed sheet. Admins can navigate to the **/team** page. Select the hamburger at the top right to log out. 
 
 ### /workouts
-This is a list of all workouts your team has done. Click on a workout to view a piece-by-piece breakdown of  
+This is a list of all workouts your team has done. Click on a workout to view a piece-by-piece breakdown for each athlete. Click "Raw/Split" (top right) to change from viewing raw time and meters to average time/500m. 
 
 ## How it works ## 
 
