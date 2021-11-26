@@ -377,6 +377,7 @@ def profile():
 
     return NotImplemented
 
+@flask_login.login_required
 @app.route('/team', methods=['GET', 'POST'])
 def team():
     email = request.cookies.get('email')
