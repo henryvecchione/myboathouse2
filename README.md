@@ -17,5 +17,18 @@ Once an account is signed in, you'll be directed to the /home page. From here, y
 ### /workouts
 This is a list of all workouts your team has done. Click on a workout to view a piece-by-piece breakdown for each athlete. Click "Raw/Split" (top right) to change from viewing raw time and meters to average time/500m. 
 
+Unimplemented: 
+- Download workout as .xlsx 
+
+### /profile
+See your own profile page, with workouts you've completed, your PRs, and shirts and championships
+
+Unimplemented:
+- Profile page
+- personal PRs
+- shirts
+
+### /team
+
 ## How it works ## 
 
