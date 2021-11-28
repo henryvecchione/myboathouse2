@@ -57,9 +57,10 @@ def user_loader(email):
 """ loads the user using the 'email' cookie set during login"""
 @login_manager.request_loader
 def request_loader(request):
-    email = request.cookies.get('email')
-    if not email:
+    if 'user' not in session:
         return
+    else:
+        email = session['user']
 
     creds = db.getCredentials(email)
     user = User()
@@ -82,21 +83,34 @@ def index():
 @flask_login.login_required
 @app.route('/home', methods=['GET'])
 def home():
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
     athlete = db.queryAthlete(user.id)
     html = render_template('home.html', perms=athlete['permissions'], first=athlete['first'])
     return make_response(html)
 
+@app.route('/howToUpload', methods=['GET'])
+def howToUpload():
+    html = render_template('howToUpload.html')
+    return make_response(html)
 
 #-----------------------------------------------------------------------
 """ File upload and download methods """
 #-----------------------------------------------------------------------
 
 """ download a blank .xlsx file for recording a workout """
+@flask_login.login_required
 @app.route('/download')
 def download():
-    email = request.cookies.get('email')
+
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
+        
     user = user_loader(email)
     athleteId = user.id
     athlete = db.queryAthlete(athleteId)
@@ -132,9 +146,13 @@ def download():
         print(e, 'sugma')
 
 """ upload a .xlsx file for processing and storing in database """
+@flask_login.login_required
 @app.route('/upload', methods=['POST'])
 def upload():
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
     athleteId = user.id
     athlete = db.queryAthlete(athleteId)
@@ -167,11 +185,12 @@ def login():
 
     # if the user has already logged in (and has not logged out)
     # sign them in
-    email = request.cookies.get('email')
-    if email:
+    if 'user' in session:
+        email = session['user'] 
         user = user_loader(email)
         athlete = db.queryAthlete(user.id)
         return redirect('/home')
+
 
     # on form submission (POST request)
     if request.method == 'POST':
@@ -200,7 +219,7 @@ def login():
                 flask_login.login_user(user)
                 session.permanent = False
                 res = redirect('/home')
-                res.set_cookie('email', email)
+                session['user'] = email
                 return res
             else:
                 error = 'Invalid Credentials. Please try again.'
@@ -214,7 +233,7 @@ def logout():
     flask_login.logout_user()
     res = redirect('/')
     # set the email cookie to empty, make it expire 
-    res.set_cookie('email', '', expires=0)
+    session.pop('user', None)
     return res
 
 
@@ -322,7 +341,10 @@ def register():
 @app.route('/workouts', methods=['GET'])
 def workouts():
     # load the user
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
     athlete = db.queryAthlete(user.id)
 
@@ -336,13 +358,16 @@ def workouts():
 @app.route('/workout', methods=['GET'])
 def workout():
     # load the user 
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
 
     workoutId = request.args.get('w')
-    session = db.queryWorkout(workoutId)
+    practice = db.queryWorkout(workoutId)
 
-    results = session['scores']
+    results = practice['scores']
     athletes = {}
     scoresDict = {}
     averages = {}
@@ -364,14 +389,17 @@ def workout():
     print(scoresDict_sorted)
 
 
-    html = render_template('workout.html' , workout=session, scores=scoresDict_sorted, athletes=athletes, averages=averages)
+    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages)
     return make_response(html)
 
 
 @flask_login.login_required
 @app.route('/profile', methods=['GET'])
 def profile():
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
     athleteId = user.id
 
@@ -380,7 +408,10 @@ def profile():
 @flask_login.login_required
 @app.route('/team', methods=['GET', 'POST'])
 def team():
-    email = request.cookies.get('email')
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
     user = user_loader(email)
     athleteId = user.id
     athlete = db.queryAthlete(athleteId)

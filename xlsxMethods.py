@@ -113,8 +113,9 @@ def xlsxBlank(teamId):
     bold = workbook.add_format({'bold' : True})
 
     # score sheet header info
-    header = ['MyBoathouse', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
-    notes = ['YYYY-MM-DD', 'Notes:']
+    header = ['irgo', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
+    date = datetime.datetime.now().strftime('%Y-%m-%d')
+    notes = [date, 'Notes:']
     firstLast = ['First', 'Last']
     example = ['(mm:ss | YYYY)','(mm:ss | YYYY)','(mm:ss | YYYY)']
     worksheet.write_row('A1', header, bold)

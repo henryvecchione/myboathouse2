@@ -21,7 +21,7 @@ Unimplemented:
 - Download workout as .xlsx 
 
 ### /profile
-See your own profile page, with workouts you've completed, your PRs, and shirts and championships
+See your own profile page, with workouts you've completed, your PRs, and awarded shirts and championships
 
 Unimplemented:
 - Profile page
@@ -29,6 +29,7 @@ Unimplemented:
 - shirts
 
 ### /team
+
 
 ## How it works ## 
 
