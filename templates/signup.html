@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-        <title>ActiveTracks</title>
+        <title>irgo</title>
     </head>
     <body>
         <div class="container-fluid">
@@ -47,13 +47,13 @@
                             <input type="password" class="form-control" name="password" id="passwordForm" value="{{request.form.password}}" required>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="classForm">Class * </label>
                                     <input type="number" id= "classForm" class="form-control" name="class" value="{{request.form.class}}" required>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-sm-4">
                                 <div class="form-check">
                                     <label for="sideform">Side * </label>
                                     <div class="btn-group btn-group-toggle btn-block" data-toggle="buttons" id="sideform">
@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                             {% if newTeam %}
-                            <div class="col-4">
+                            <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="teamForm">Team * </label>
                                     <input type="number" id= "teamForm" class="form-control" name="team" value="{{teamId}}" disabled>
@@ -82,7 +82,7 @@
                             </div>
                             <input type="hidden" name='admin' value='1'>
                             {% else %}
-                            <div class="col-4">
+                            <div class="col-sm-12">
                                 <div class="form-group">
                                     <label for="teamForm">Team * </label>
                                     <input type="number" id= "teamForm" class="form-control" name="team" value="{{request.form.team}}" required>
