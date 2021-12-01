@@ -44,8 +44,11 @@ def xlsxRead(filename, teamId):
         except Exception as _:
             continue
 
-        athleteId = str(db.queryAthleteByName(first, last)['_id'])
-        print(athleteId)
+        try:
+            athleteId = str(db.queryAthleteByName(first, last)['_id'])
+        except Exception as e:
+            print(str(e), f': in xlsxRead(), check the spelling of {first} {last}')
+            continue
 
         scores = []
 
@@ -55,14 +58,17 @@ def xlsxRead(filename, teamId):
                 if isinstance(piece, int):
                     t = str(col[piece]).split(':')
                     print(f'{first} {last} went {t}')
+                    # sometimes the time comes out like ['00', 'MM', 'SS.TT']
                     if t[0] == '00':
                         secSplit = t[2].split('.')
+                        # if the tenth is 0, the seconds are 'SS', not 'SS.00'
                         if len(secSplit) == 1:
                             t_sec = secSplit[0]
                             t_tenth = 0
                         else:
                             t_sec, t_tenth = t[2].split('.') 
                         time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
+                    # otherwise it's like ['MM', 'SS.TT']
                     else:
                         t_tenth = (t[2].split('.'))[1]
                         time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
