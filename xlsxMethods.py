@@ -131,9 +131,10 @@ def xlsxBlank(teamId):
 
     # write in the athletes
     try:
-        athletes = db.getAllAthletes(teamId, active_only=True)
+        athletes = db.getAllAthletes(teamId)
         for ind, a in enumerate(athletes):
             nameRow = [a['last'], a['first']]
+            print(nameRow)
             cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
             worksheet1.write_row(cell, nameRow)
         workbook.close()
