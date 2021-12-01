@@ -45,6 +45,7 @@ def xlsxRead(filename, teamId):
             continue
 
         athleteId = str(db.queryAthleteByName(first, last)['_id'])
+        print(athleteId)
 
         scores = []
 
@@ -53,8 +54,14 @@ def xlsxRead(filename, teamId):
                 # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
                     t = str(col[piece]).split(':')
+                    print(f'{first} {last} went {t}')
                     if t[0] == '00':
-                        t_sec, t_tenth = t[2].split('.') 
+                        secSplit = t[2].split('.')
+                        if len(secSplit) == 1:
+                            t_sec = secSplit[0]
+                            t_tenth = 0
+                        else:
+                            t_sec, t_tenth = t[2].split('.') 
                         time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
                     else:
                         t_tenth = (t[2].split('.'))[1]
@@ -72,8 +79,14 @@ def xlsxRead(filename, teamId):
                 elif '.' in piece:
                     meters = int(piece.split('.')[0])
                     t = str(col[piece]).split(':')
+                    print(f'{first} {last} went {t}')
                     if t[0] == '00':
-                        t_sec, t_tenth = t[2].split('.') 
+                        secSplit = t[2].split('.')
+                        if len(secSplit) == 1:
+                            t_sec = secSplit[0]
+                            t_tenth = 0
+                        else:
+                            t_sec, t_tenth = t[2].split('.') 
                         time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
                     else:
                         t_tenth = (t[2].split('.'))[1]
@@ -81,7 +94,7 @@ def xlsxRead(filename, teamId):
                     p = Piece(meters, time, True)
                     scores.append(p)
                 else:
-                    print("Distance/time mismatch")
+                    print(f"Distance/time mismatch: {piece} {col[piece]}")
                     return None
             except TypeError as e:
                 print(str(e))
@@ -108,6 +121,7 @@ def xlsxRead(filename, teamId):
         'notes' : notes
     }
 
+    print('read xlsx file')
     return workoutDict
 
 
