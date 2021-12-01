@@ -141,9 +141,12 @@ def download():
                 'Content-Encoding': mimetype_tuple[1]
             })
         response.set_cookie('fileDownload', 'true', path='/')
+
+        print(f'/download accessed by {athlete["first"]} {athlete["last"]}')
+
         return response
     except Exception as e:
-        print(e, 'sugma')
+        print(e, ' in download')
 
 """ upload a .xlsx file for processing and storing in database """
 @flask_login.login_required
@@ -166,6 +169,7 @@ def upload():
             flash("failed to add workout")
             return redirect('/home')
         else:
+            print(f'Sheet uploaded by {athlete["first"]} {athlete["last"]}. WorkoutId: {add}')
             return redirect('workout?w={}'.format(add))
     except Exception as e:
         print(str(e), ' in upload')
@@ -189,6 +193,7 @@ def login():
         email = session['user'] 
         user = user_loader(email)
         athlete = db.queryAthlete(user.id)
+        print(f'{athlete["first"]} {athlete["last"]} logged in, old session')
         return redirect('/home')
 
 
@@ -205,7 +210,7 @@ def login():
 
         # getCredentials returns none if email not found in DB
         if not creds:
-            error = 'Missing Credentials. Please try again.'
+            error = 'Invalid Credentials. Please try again.'
         # else check password hash
         else:
 
@@ -224,6 +229,7 @@ def login():
             else:
                 error = 'Invalid Credentials. Please try again.'
 
+    print(f'{athlete["first"]} {athlete["last"]} logged in, new session')
     return render_template('login.html', error=error)
 
 """ log out the user """
@@ -307,6 +313,9 @@ def signup():
             if not add:
                 error = "failed to add user"
 
+
+            print(f'New user registered: {first} {last}, email: {email}, {side} side, {team} team')
+
             html = redirect('/home')
             return make_response(html)
     teamId = request.args.get('t')
@@ -324,6 +333,8 @@ def register():
         name = request.form['teamName'].capitalize()
 
         teamId = db.addTeam(name)
+
+        print(f'New team added: {name}. id:{teamId}')
 
         html = render_template('signup.html', newTeam=True, teamId=teamId)
         return redirect(f'/signup?t={teamId}')
@@ -378,16 +389,15 @@ def delete():
 
         # verify requesting athlete is signed in athlete
         if athleteId != athlete['_id']:
-            print('failing here')
             return redirect('/home')
         # verify requesting athlete 'owns' that workout
         if athlete['teamId'] != db.queryWorkout(workoutId)['teamId']:
-            print('no, here')
             return redirect('home')
         
         deleted = db.deleteWorkout(workoutId)
 
         if deleted:
+            print(f'workout {workoutId} deleted by {athlete["first"]} {athlete["last"]}')
             return redirect('/workouts')
 
     workout = db.queryWorkout(workoutId)
@@ -428,10 +438,6 @@ def workout():
 
 
     scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
-
-
-    print(scoresDict_sorted)
-
 
     html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages)
     return make_response(html)
@@ -476,7 +482,7 @@ def team():
             if 'active' not in request.form:
                 sumModified += db.editAthlete(int(athleteId), 'active', False)
 
-
+    print(f'Team "{teamName}" edited by {athlete["first"]} {athlete["last"]}')
 
     html= render_template('team.html', athletes=teammates, teamName=teamName)
     return make_response(html)

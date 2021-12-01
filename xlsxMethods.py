@@ -112,7 +112,6 @@ def xlsxRead(filename, teamId):
         'scores' : Binary(workoutListBytes),
         'notes' : notes
     }
-    pprint(workoutDict)
 
     return workoutDict
 
@@ -155,7 +154,6 @@ def xlsxBlank(teamId):
         athletes = db.getAllAthletes(teamId)
         for ind, a in enumerate(athletes):
             nameRow = [a['last'], a['first']]
-            print(nameRow)
             cell = 'A' + str(ind + 1) # enumerate is 0-index but excel is 1-index
             worksheet1.write_row(cell, nameRow)
         workbook.close()

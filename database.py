@@ -39,6 +39,7 @@ def getCollection(collection):
 # general athlete collection methods 
 
 def addAthlete(athleteDict):
+    # print(f'addAthlete called with {athleteDict}')
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         result = collection_name.insert_one(athleteDict)
@@ -48,6 +49,7 @@ def addAthlete(athleteDict):
         return None
 
 def editAthlete(athleteId, field, newVal):
+    # print(f'editAthlete called with {athleteId}, {field}, {newVal}')
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         result = collection_name.update_one({'_id' : athleteId}, {'$set' : {field : newVal}})
@@ -57,6 +59,7 @@ def editAthlete(athleteId, field, newVal):
         return None
 
 def queryAthlete(athleteId):
+    # print(f'queryAthlete called with {athleteId}')
     try:
         athleteId = int(athleteId)
         collection_name = getCollection(ATHLETE_COLLECTION)
@@ -66,6 +69,7 @@ def queryAthlete(athleteId):
         return None
 
 def queryAthleteByName(first, last):
+    # print(f'queryAthleteByName called with {first} {last}')
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         return collection_name.find_one({'first' : first, 'last' : last})
@@ -74,6 +78,7 @@ def queryAthleteByName(first, last):
         return None
 
 def getAllAthletes(teamId, sort_by='name', active_only=False):
+    # print(f'getAllAthletes called with {teamId}')    
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         if active_only:
@@ -88,6 +93,7 @@ def getAllAthletes(teamId, sort_by='name', active_only=False):
 # general workout collection methods 
 
 def addWorkout(workoutDict, teamId):
+    # print(f'addworkout called with {workoutDict}, {teamId}')
     try:
         print(workoutDict)
         collection_name = getCollection(WORKOUT_COLLECTION)
@@ -99,6 +105,7 @@ def addWorkout(workoutDict, teamId):
         return None
 
 def editWorkout(workoutId, field, newVal):
+    # print(f'editWorkout called with {workoutId}, {field}, {newVal}')
     try:
         collection_name = getCollection(WORKOUT_COLLECTION)
         result = collection_name.update_one({'_id' : workoutId}, {'$set' : {field : newVal}})
@@ -108,6 +115,7 @@ def editWorkout(workoutId, field, newVal):
         return None
 
 def queryWorkout(workoutId):
+    # print(f'queryWorkout called with {workoutId}')
     try:
         workoutId = int(workoutId)
         collection_name = getCollection(WORKOUT_COLLECTION)
@@ -120,6 +128,7 @@ def queryWorkout(workoutId):
         return None
 
 def deleteWorkout(workoutId):
+    # print(f'deleteWorkout called with {workoutId}')
     try:
         collection_name = getCollection(WORKOUT_COLLECTION)
         result = collection_name.delete_one({'_id' : workoutId})
@@ -129,6 +138,7 @@ def deleteWorkout(workoutId):
         return None
 
 def getAllWorkouts(teamId, sort_by='date'):
+    # print(f'getAllWorkouts called with {teamId}')
     try:
         collection_name = getCollection(WORKOUT_COLLECTION)
         return collection_name.find({'teamId' : teamId}, sort=[(sort_by, pymongo.DESCENDING)])
@@ -139,6 +149,7 @@ def getAllWorkouts(teamId, sort_by='date'):
 # ------------------------------------------------------------------ # 
 # general team db methods
 def queryTeam(teamId):
+    # print(f'queryTeam called with {teamId}')
     try:
         teamId = int(teamId)
         collection_name = getCollection(TEAMS_COLLECTION)
@@ -149,6 +160,7 @@ def queryTeam(teamId):
         return None
 
 def addTeam(name):
+    # print(f'addTeam called with {name}')
     try:
         teamId = random.randint(10, 999999)
         # ensure no id collision
@@ -204,6 +216,7 @@ def getScoreByAthlete(athleteId, workoutId):
 # ------------------------------------------------------------------- #
 # add an athlete to the credentials database
 def addCredentials(athleteId, email, pwHash, salt):
+    # print(f'addCredentials called with {athleteId}, {email}')
     try:
         collection_name = getCollection(CREDENTIALS_COLLECTION)
         newCreds = {
@@ -220,6 +233,7 @@ def addCredentials(athleteId, email, pwHash, salt):
 
 
 def getCredentials(email):
+    # print(f'getCredentials called with {email}')
     try:
         collection_name = getCollection(CREDENTIALS_COLLECTION)
         result = collection_name.find_one({'email' : email})
