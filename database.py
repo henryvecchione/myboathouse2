@@ -119,6 +119,15 @@ def queryWorkout(workoutId):
         print(str(e))
         return None
 
+def deleteWorkout(workoutId):
+    try:
+        collection_name = getCollection(WORKOUT_COLLECTION)
+        result = collection_name.delete_one({'_id' : workoutId})
+        return result.deleted_count
+    except Exception as e:
+        print(str(e))
+        return None
+
 def getAllWorkouts(teamId, sort_by='date'):
     try:
         collection_name = getCollection(WORKOUT_COLLECTION)

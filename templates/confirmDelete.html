@@ -27,28 +27,19 @@
 
             <div class="card" style="width: 100%;">
                 <div class="card-body">
-                    <h3>Workouts:</h3>
-                    <ul class="list-group overflow-auto" style="height: 100%;">
-                        {% for workout in workouts %}
-                            <li  class="list-group-item"><a href="/workout?w={{workout['_id']}}"><h5>{{workout['title']}}</h5></a>{{workout['date']}} {% if delPerm %}<span ><a style="color: red;" href="/deleteWorkout?wid={{workout['_id']}}&aid={{athId}}">(Delete)</a></span>{% endif %}</li>
-                        {% endfor %}
-                    </ul>
+                    <h1>Are you sure you want to delete this workout?</h1>
+                    <h3>{{workout['title']}}</h3>
+                    <form action="/deleteWorkout" method="POST">
+                        <input type="hidden" value="{{wid}}" name="wid">
+                        <input type="hidden" value="{{aid}}" name="aid">
+                        <button type="submit" value="Submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </div>
             </div>
 
 
         </div>
 
-        <script>
-            if (Math.floor(Math.random()*6) == 1){
-                var now = new Date()
-                if (now.getHours() > 18){
-                    if (now.getHours() < 20){
-                        alert("Warning: The server has detected you looking at erg scores during dinner. Please look up from your phone and engage with those around you.");
-                    }
-                }
-            }
-        </script>
 
 
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>

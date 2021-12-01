@@ -349,9 +349,53 @@ def workouts():
     athlete = db.queryAthlete(user.id)
 
     workouts = db.getAllWorkouts(athlete['teamId'])
-
-    html = render_template('workouts.html' ,workouts=workouts)
+    
+    if 'cox' in athlete['permissions'] or 'admin' in athlete['permissions']:
+        delPerm = True
+    else:
+        delPerm = False
+    
+    html = render_template('workouts.html' ,workouts=workouts, delPerm=delPerm, athId=athlete['_id'])
     return make_response(html)
+
+@flask_login.login_required
+@app.route('/deleteWorkout', methods=['GET', 'POST'])
+def delete():
+    # load the user
+    if 'user' not in session:
+        return redirect('/login')
+    else:
+        email = session['user']
+    user = user_loader(email)
+    athlete = db.queryAthlete(user.id)
+
+    workoutId = request.args.get('wid')
+    athleteId = request.args.get('aid')
+
+    if request.method == 'POST':
+        athleteId = int(request.form['aid'])
+        workoutId = int(request.form['wid'])
+
+        # verify requesting athlete is signed in athlete
+        if athleteId != athlete['_id']:
+            print('failing here')
+            return redirect('/home')
+        # verify requesting athlete 'owns' that workout
+        if athlete['teamId'] != db.queryWorkout(workoutId)['teamId']:
+            print('no, here')
+            return redirect('home')
+        
+        deleted = db.deleteWorkout(workoutId)
+
+        if deleted:
+            return redirect('/workouts')
+
+    workout = db.queryWorkout(workoutId)
+    html = render_template('confirmDelete.html', workout=workout, wid=workoutId, aid=athleteId)
+    return make_response(html)
+
+
+
 
 """ display a single workout """
 @flask_login.login_required
