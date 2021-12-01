@@ -56,7 +56,7 @@
                                 {% set athleteId = id[0] %}
                                 {% set avg = id[1][0] %}
                                 {% set pieces = id[1][1] %}
-                                <tr>
+                                <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
                                     <th scope="row">{{loop.index}}</th>
                                     <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
                                     <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
@@ -86,7 +86,7 @@
                             {% set athleteId = id[0] %}
                             {% set avg = id[1][0] %}
                             {% set pieces = id[1][1] %}
-                            <tr>
+                            <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
                                 <th scope="row">{{loop.index}}</th>
                                 <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
                                 <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
