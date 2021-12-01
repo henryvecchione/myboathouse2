@@ -225,11 +225,12 @@ def login():
                 session.permanent = False
                 res = redirect('/home')
                 session['user'] = email
+                print(f'{email} logged in, new session')
                 return res
             else:
                 error = 'Invalid Credentials. Please try again.'
 
-    print(f'{email} logged in, new session')
+
     return render_template('login.html', error=error)
 
 """ log out the user """
@@ -389,10 +390,12 @@ def delete():
 
         # verify requesting athlete is signed in athlete
         if athleteId != athlete['_id']:
-            return redirect('/home')
+            print(f"Delete accessed by unauthorized user {athlete['first']} {athlete['last']}")
+            return render_template('error.html'), 500
         # verify requesting athlete 'owns' that workout
         if athlete['teamId'] != db.queryWorkout(workoutId)['teamId']:
-            return redirect('home')
+            print(f"Cross-team delete attempted by user {athlete['first']} {athlete['last']} on team:{athlete['teamId']}")
+            return render_template('error.html'), 500
         
         deleted = db.deleteWorkout(workoutId)
 
@@ -465,6 +468,12 @@ def team():
     user = user_loader(email)
     athleteId = user.id
     athlete = db.queryAthlete(athleteId)
+
+    if 'admin' not in athlete['permissions']:
+        return render_template('error.html'), 500
+
+
+
     teamId = athlete['teamId']
     teamName = db.queryTeam(teamId)['name']
     teammates = db.getAllAthletes(teamId)
@@ -486,6 +495,18 @@ def team():
 
     html= render_template('team.html', athletes=teammates, teamName=teamName)
     return make_response(html)
+
+#-----------------------------------------------------------------------
+""" other and testing """
+#-----------------------------------------------------------------------
+
+@app.errorhandler(404)
+@app.errorhandler(500)
+def handleError(ex):
+
+    html = render_template('error.html')
+    response = make_response(html)
+    return response
 
 
 #-----------------------------------------------------------------------

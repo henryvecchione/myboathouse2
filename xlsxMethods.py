@@ -54,14 +54,11 @@ def xlsxRead(filename, teamId):
                 if isinstance(piece, int):
                     t = str(col[piece]).split(':')
                     if t[0] == '00':
-                        print(t)
                         t_sec, t_tenth = t[2].split('.') 
                         time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
-                        print(time, '1, 1')
                     else:
                         t_tenth = (t[2].split('.'))[1]
                         time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
-                        print(time, '1, 2')
                     p = Piece(piece, time, True)
                     scores.append(p)
                 # else if its a datetime, make a time piece
@@ -78,11 +75,9 @@ def xlsxRead(filename, teamId):
                     if t[0] == '00':
                         t_sec, t_tenth = t[2].split('.') 
                         time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
-                        print(time, '2, 1')
                     else:
                         t_tenth = (t[2].split('.'))[1]
                         time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
-                        print(time, '2, 2')
                     p = Piece(meters, time, True)
                     scores.append(p)
                 else:

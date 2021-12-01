@@ -32,7 +32,9 @@
                     <form id='teamForm' action="/team" method="POST">
                     <div class="row">
                         <div class="col-8">
-                            <h3>{{teamName}}: id {{athletes[0]['teamId']}}</h3>
+                            <h3>{{teamName}}</h3>
+                            <h5>Team id: {{athletes[0]['teamId']}}</h5>
+                            <h5>Signup link: <a href="/signup?t={{athletes[0]['teamId']}}">irgo.herokuapp.com/signup?t={{athletes[0]['teamId']}}</a></h5>
                         </div>
                         <div class="col-4">
                             <button type="submit" id="submitButton" class="btn btn-secondary btn-block" disabled>Save Changes</button>
