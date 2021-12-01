@@ -229,7 +229,7 @@ def login():
             else:
                 error = 'Invalid Credentials. Please try again.'
 
-    print(f'{athlete["first"]} {athlete["last"]} logged in, new session')
+    print(f'{email} logged in, new session')
     return render_template('login.html', error=error)
 
 """ log out the user """
