@@ -23,7 +23,7 @@ def xlsxRead(filename, teamId):
     data = data.T
 
     # parse the date and pieces
-    date = data[0]['MyBoathouse']
+    date = data[0]['irgo']
     if 'Y' in date or 'M' in date or 'D' in date:
         date = datetime.datetime.now()
     pieces = list(data.index)[2:] 
@@ -38,8 +38,12 @@ def xlsxRead(filename, teamId):
         # this isn't obvious but necessitated by structure of sheet
         col = data[i]
         # first and last name of athlete
-        first = col['MyBoathouse'].capitalize()
-        last = col['Piece:'].capitalize()
+        try:
+            first = col['irgo'].capitalize()
+            last = col['Piece:'].capitalize()
+        except Exception as _:
+            continue
+
         athleteId = str(db.queryAthleteByName(first, last)['_id'])
 
         scores = []
@@ -49,7 +53,15 @@ def xlsxRead(filename, teamId):
                 # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
                     t = str(col[piece]).split(':')
-                    time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
+                    if t[0] == '00':
+                        print(t)
+                        t_sec, t_tenth = t[2].split('.') 
+                        time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
+                        print(time, '1, 1')
+                    else:
+                        t_tenth = (t[2].split('.'))[1]
+                        time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
+                        print(time, '1, 2')
                     p = Piece(piece, time, True)
                     scores.append(p)
                 # else if its a datetime, make a time piece
@@ -63,7 +75,14 @@ def xlsxRead(filename, teamId):
                 elif '.' in piece:
                     meters = int(piece.split('.')[0])
                     t = str(col[piece]).split(':')
-                    time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t[2])*100000)
+                    if t[0] == '00':
+                        t_sec, t_tenth = t[2].split('.') 
+                        time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
+                        print(time, '2, 1')
+                    else:
+                        t_tenth = (t[2].split('.'))[1]
+                        time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
+                        print(time, '2, 2')
                     p = Piece(meters, time, True)
                     scores.append(p)
                 else:
@@ -84,6 +103,7 @@ def xlsxRead(filename, teamId):
 
     workoutListBytes = pickle.dumps(workoutList)
 
+
     workoutDict = {
         '_id' : nextId,
         'title' : ', '.join(str(p) for p in pieces),
@@ -92,6 +112,7 @@ def xlsxRead(filename, teamId):
         'scores' : Binary(workoutListBytes),
         'notes' : notes
     }
+    pprint(workoutDict)
 
     return workoutDict
 
