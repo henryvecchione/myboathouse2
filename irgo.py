@@ -286,8 +286,8 @@ def signup():
             if side == 'cox':
                 permissions.append('cox')
 
-            if 'admin' in request.form.keys():
-                permissions.append('admin')
+            # if 'admin' in request.form.keys():
+            #     permissions.append('admin')
 
             athlete = {
                 "_id" : newId,
