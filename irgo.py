@@ -420,6 +420,12 @@ def workout():
     else:
         email = session['user']
     user = user_loader(email)
+    athlete = db.queryAthlete(user.id)
+
+    if 'admin' in athlete['permissions']:
+        isAdmin = True
+    else:
+        isAdmin = False
 
     workoutId = request.args.get('w')
     practice = db.queryWorkout(workoutId)
@@ -436,13 +442,13 @@ def workout():
             'last' : ath['last'],
             'side' : ath['side']
         }
-        scoresDict[athleteId] = workout.split, workout.scores
+        scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
         averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
 
 
     scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
 
-    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages)
+    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, isAdmin=isAdmin)
     return make_response(html)
 
 
@@ -496,8 +502,27 @@ def team():
     html= render_template('team.html', athletes=teammates, teamName=teamName)
     return make_response(html)
 
+
 #-----------------------------------------------------------------------
-""" other and testing """
+""" database edit routes """
+#-----------------------------------------------------------------------
+@app.route('/editWorkout', methods=['POST'])
+def editWorkout():
+
+    field = request.form['field']
+    newVal = request.form['newVal']
+    workoutID = int(request.form['workoutId'])
+
+    res = db.editWorkout(workoutID, field, newVal)
+
+    print(res, f' workout {workoutID} edited fied {field} with {newVal}')
+
+    return redirect(f'/workout?w={workoutID}')
+
+
+
+#-----------------------------------------------------------------------
+""" Error handling """
 #-----------------------------------------------------------------------
 
 @app.errorhandler(404)

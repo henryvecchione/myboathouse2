@@ -368,12 +368,14 @@ if __name__ == "__main__":
     # print(creds)
     # print(bcrypt.checkpw(b'sugmaLigma', creds['pwHash']))
 
-    for a in getAllAthletes(1, sort_by='class'):
-        pprint(a)
-    for w in getAllWorkouts(1):
-        pprint(w)
+    # for a in getAllAthletes(1, sort_by='class'):
+    #     pprint(a)
+    # for w in getAllWorkouts(1):
+    #     pprint(w)
 
-    # for z in getScoreByAthlete(69,2):
-    #     pprint(z)
+    # # for z in getScoreByAthlete(69,2):
+    # #     pprint(z)
 
-    print(editAthlete(69, 'first', 'wiener'))
+    # print(editAthlete(69, 'first', 'wiener'))
+
+    print(editWorkout(75, 'title', "10k, 10x(30' on, 1:30 off)"))

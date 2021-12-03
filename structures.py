@@ -16,6 +16,17 @@ class Workout:
     def addPiece(self, piece):
         self.scores.append(piece)
 
+    def watts(self):
+        totalDist = 0
+        totalSec = 0
+        for piece in self.scores:
+            totalSec += piece.time.minute * 60 + piece.time.second + (piece.time.microsecond/1000000)
+            totalDist += piece.meters
+
+        pace = totalSec/totalDist
+        watts = 2.80 / (pace**3)
+        return watts // 1
+
     def __str__(self):
         s = f'Workout({self.athleteId}, {self.scores}, {self.split})'
         return s
@@ -68,7 +79,14 @@ class Piece:
                 return (str(self.meters), splitStr)
 
     def watts(self):
-        return NotImplemented
+        # from https://www.concept2.com/indoor-rowers/training/calculators/watts-calculator : 
+        # watts = 2.80/pace**3, where pace = total seconds / meters 
+        totalSec = self.time.minute * 60 + self.time.second + (self.time.microsecond/1000000)
+        pace = totalSec / self.meters
+
+        watts = 2.80/(pace**3)
+
+        return int(watts//1)
 
 
     def __str__(self):

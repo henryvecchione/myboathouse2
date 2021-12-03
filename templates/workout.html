@@ -29,27 +29,81 @@
 
             <div class="card" style="width: 100%; ">
                 <div class="card-body">
+                    {% if isAdmin %}
+                    <form action="/editWorkout" method="POST">
+                        <input style="height: 3rem; font-size: 16pt " name="newVal" value="{{workout['title']}}" />
+                        <input type="hidden" name="field" value="title" />
+                        <input type="hidden" name="workoutId" value="{{workout['_id']}}" />
+                        <button type="submit" class="btn btn-primary">Edit title</button>
+                    </form>
+                    {% else %}
                     <h3>{{workout['title']}}</h3>
+                    {% endif %}
                     <div class="row" style="margin-bottom: 1rem;">
                         <div class="col-8">
                             <h5>{{workout['date']}}</h5>
                         </div>
                         <div class="col-4">
-                            <button class="btn btn-secondary btn-block"  id="toggleSplit">Raw/Split</button>
+                            <div class="btn-group btn-block" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="rawRadio" autocomplete="off" onclick="showRaw()" value="raw"checked>
+                                <label class="btn btn-outline-primary" for="rawRadio">Raw</label>
+                              
+                                <input type="radio" class="btn-check" name="btnradio" id="splitRadio" autocomplete="off" onclick="showSplit()" value="split">
+                                <label class="btn btn-outline-primary" for="splitRadio">Splits</label>
+                              
+                                <input type="radio" class="btn-check" name="btnradio" id="wattRadio" autocomplete="off" onclick="showWatt()" value="watt">
+                                <label class="btn btn-outline-primary" for="wattRadio">Watts</label>
+                              </div>
                         </div>
                     </div>
 
                     <div style="overflow-x: scroll;" >
-                        <table class="table" id="times" style="visibility: visible;">
-                            <thead>
-                              <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Average</th>
-                                {% for piece in workout['pieces'] %}
-                                <th scope="col">{{piece}}</th>
+                        <div id="raw div" >
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th width="2%" scope="col">#</th>
+                                    <th width="18%" scope="col">Name</th>
+                                    <th width="5%" scope="col"></th>
+                                    <th width="15%" scope="col">Average</th>
+                                    {% for piece in workout['pieces'] %}
+                                    <th width="" scope="col">{{piece}}</th>
+                                    {% endfor %}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                {% for id in scores %}
+                                    {% set athleteId = id[0] %}
+                                    {% set avg = id[1][0] %}
+                                    {% set pieces = id[1][1] %}
+                                    <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
+                                        <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
+                                        <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
+                                        {% for piece in pieces %}
+                                            <td>{{piece.score(as_string=True)[0]}}</td>
+                                        {% endfor %}
+                                        </div>
+                                    </tr>
                                 {% endfor %}
-                              </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        
+                    <div id="split div" style="display: none;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="2%" scope="col">#</th>
+                                    <th width="18%" scope="col">Name</th>
+                                    <th width="5%" scope="col"></th>
+                                    <th width="15%" scope="col">Average</th>
+                                    {% for piece in workout['pieces'] %}
+                                    <th width="" scope="col">{{piece}}</th>
+                                    {% endfor %}
+                                  </tr>
                             </thead>
                             <tbody>
                             {% for id in scores %}
@@ -59,46 +113,53 @@
                                 <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
                                     <th scope="row">{{loop.index}}</th>
                                     <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
+                                    <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
                                     <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
                                         {% for piece in pieces %}
-                                            <td>{{piece.score(as_string=True)[0]}}</td>
+                                            <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
                                         {% endfor %}
                                     </div>
                                 </tr>
                             {% endfor %}
+    
                             </tbody>
                         </table>
+                    </div>
 
-                        
-                    <table class="table" id="splits" style="display: none;">
-                        <thead>
-                            <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Average</th>
-                            {% for piece in workout['pieces'] %}
-                            <th scope="col">{{piece}}</th>
-                            {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for id in scores %}
-                            {% set athleteId = id[0] %}
-                            {% set avg = id[1][0] %}
-                            {% set pieces = id[1][1] %}
-                            <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
-                                <th scope="row">{{loop.index}}</th>
-                                <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
-                                <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
-                                    {% for piece in pieces %}
-                                        <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+                    <div id="watt div" style="display: none;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th width="2%" scope="col">#</th>
+                                    <th width="18%" scope="col">Name</th>
+                                    <th width="5%" scope="col"></th>
+                                    <th width="15%" scope="col">Average</th>
+                                    {% for piece in workout['pieces'] %}
+                                    <th width="" scope="col">{{piece}}</th>
                                     {% endfor %}
-                                </div>
-                            </tr>
-                        {% endfor %}
+                                  </tr>
+                            </thead>
+                            <tbody>
+                            {% for id in scores %}
+                                {% set athleteId = id[0] %}
+                                {% set avg = id[1][0] %}
+                                {% set pieces = id[1][1] %}
+                                <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
+                                    <th scope="row">{{loop.index}}</th>
+                                    <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
+                                    <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
+                                    <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
+                                        {% for piece in pieces %}
+                                            <td>{{piece.watts()}}<span style="font-size: xx-small;">watt</span></td>
+                                        {% endfor %}
+                                    </div>
+                                </tr>
+                            {% endfor %}
+    
+                            </tbody>
+                        </table>
+                    </div>
 
-                        </tbody>
-                    </table>
                 </div>
                     
             </div>
@@ -107,18 +168,30 @@
 
 
         <script>
-            $(document).ready(function(){
-              $("#toggleSplit").click(function(){
-                $("#splits").toggle();
-                $("#times").toggle();
-              });
-            });
+            function showRaw(){
+                document.getElementById('raw div').style.display ='block';
+                document.getElementById('split div').style.display ='none';
+                document.getElementById('watt div').style.display ='none';
+            }
+            function showSplit(){
+                document.getElementById('raw div').style.display ='none';
+                document.getElementById('split div').style.display ='block';
+                document.getElementById('watt div').style.display ='none';
+            }
+            function showWatt(){
+                document.getElementById('raw div').style.display ='none';
+                document.getElementById('split div').style.display ='none';
+                document.getElementById('watt div').style.display ='block';
+            }
         </script>
 
 
 
 
         <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>     
+        <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>   
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>     
     </body>
 </html>
