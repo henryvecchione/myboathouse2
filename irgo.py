@@ -460,7 +460,12 @@ def profile():
     else:
         email = session['user']
     user = user_loader(email)
-    athleteId = user.id
+
+    if request.args.get('a'):
+        athleteId = request.args.get('a')
+    else:
+        athleteId = user.id
+        ahlete = db.queryAthlete(athleteId)
 
     return NotImplemented
 
