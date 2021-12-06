@@ -12,6 +12,8 @@ import xlsxMethods
 from io import StringIO
 from datetime import datetime
 import mimetypes
+import pickle
+from bson.binary import Binary
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -164,13 +166,24 @@ def upload():
     file = request.files['sheet']
     try:
         workout = xlsxMethods.xlsxRead(file, teamId)
-        add = db.addWorkout(workout, teamId)
-        if not add:
+        addedId = db.addWorkout(workout, teamId)
+        if not addedId:
             flash("failed to add workout")
             return redirect('/home')
         else:
-            print(f'Sheet uploaded by {athlete["first"]} {athlete["last"]}. WorkoutId: {add}')
-            return redirect('workout?w={}'.format(add))
+            print(f'Sheet uploaded by {athlete["first"]} {athlete["last"]}. WorkoutId: {addedId}')
+
+            # attribute the workout to the participating athletes
+            allScores = pickle.loads(workout['scores'])
+            for workout in allScores:
+                athleteId = workout.athleteId
+                pickledWorkout = Binary(pickle.dumps(workout))
+                print(f'attributed to {athleteId}')
+                edited = db.addWorkoutToAthlete(athleteId, pickledWorkout, addedId)
+                print(edited)
+
+
+            return redirect('workout?w={}'.format(addedId))
     except Exception as e:
         print(str(e), ' in upload')
         flash("There was an error uploading the file")
@@ -399,7 +412,12 @@ def delete():
         
         deleted = db.deleteWorkout(workoutId)
 
+
         if deleted:
+            for athlete in db.getAllAthletes(athlete['teamId']):
+                res = db.removeWorkoutFromAthlete(athlete['_id'], workoutId)
+                res = db.removeWorkoutFromAthlete(athlete['_id'], 92) # clean db on nex run
+                print(f'unattributed {workoutId} from {athlete["_id"]} : {res}')
             print(f'workout {workoutId} deleted by {athlete["first"]} {athlete["last"]}')
             return redirect('/workouts')
 

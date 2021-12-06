@@ -78,7 +78,7 @@ def queryAthleteByName(first, last):
         return None
 
 def getAllAthletes(teamId, sort_by='name', active_only=False):
-    # print(f'getAllAthletes called with {teamId}')    
+    print(f'getAllAthletes called with {teamId}')    
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         if active_only:
@@ -89,6 +89,23 @@ def getAllAthletes(teamId, sort_by='name', active_only=False):
         print(str(e))
         return None
 
+def addWorkoutToAthlete(athleteId, newWorkout, workoutId):
+    try:
+        collection_name = getCollection(ATHLETE_COLLECTION)
+        result = collection_name.update({'_id' : int(athleteId)}, {'$set' : {f'workouts.{workoutId}' : newWorkout}})
+        return result
+    except Exception as e:
+        print(str(e))
+        return None
+
+def removeWorkoutFromAthlete(athleteId, workoutId):
+    try:
+        collection_name = getCollection(ATHLETE_COLLECTION)
+        result = collection_name.update({'_id' : athleteId}, {'$unset' : {f'workouts.{workoutId}' : ''}})
+        return result
+    except Exception as e:
+        print(str(e))
+        return None
 # ------------------------------------------------------------------- #
 # general workout collection methods 
 
@@ -248,110 +265,110 @@ def getCredentials(email):
 # Test code
 
 if __name__ == "__main__":
-    athlete1 = {
-        "_id" : 69,
-        "first" : "Henry",
-        "last" : "Vecchione",
-        "permissions" : ["admin"],
-        "prs" : {
-            "2000m" : "6:24",
-            "6000m" : "20:32"
-        },
-        "workouts" : [],
-        "side" : ["port"],
-        "class" : 2022,
-        "active" : True,
-        "awards" : {
-            "earc" : [],
-            "ira" : [],
-            "shirts" : ['g','de','n','da','t','p']
-        },
-        "teamId" : 1
-    }
-    athlete2 = {
-        "_id" : 1,
-        "first" : "Cal",
-        "last" : "Gorvy",
-        "permissions" : [],
-        "prs" : {
-            "2000m" : "5:59",
-            "6000m" : "17:24"
-        },
-        "workouts" : [],
-        "side" : ["starboard"],
-        "class" : 2025,
-        "active" : True,
-        "awards" : {
-            "earc" : ['4V'],
-            "ira" : ['1V'],
-            "shirts" : ['g','de','n','h','y','t','p']
-        },
-        "teamId" : 1
-    }
-    athlete3 = {
-        "_id" : 2,
-        "first" : "Peter",
-        "last" : "Skinner",
-        "permissions" : [],
-        "prs" : {
-            "2000m" : "5:59",
-            "6000m" : "17:24"
-        },
-        "workouts" : [],
-        "side" : ["port"],
-        "class" : 2023,
-        "active" : True,
-        "awards" : {
-            "earc" : ['4V'],
-            "ira" : ['1V'],
-            "shirts" : ['g','de','n','h','y','t','p']
-        },
-        "teamId" : 1
-    }
-    athlete4 = {
-        "_id" : 3,
-        "first" : "Will",
-        "last" : "Olson",
-        "permissions" : [],
-        "prs" : {
-            "2000m" : "5:59",
-            "6000m" : "17:24"
-        },
-        "workouts" : [],
-        "side" : ["port"],
-        "class" : 2023,
-        "active" : True,
-        "awards" : {
-            "earc" : ['4V'],
-            "ira" : ['1V'],
-            "shirts" : ['g','de','n','h','y','t','p']
-        },
-        "teamId" : 1
-    }
-    workout1 = {
-        '_id' : 1,
-        'title' : '2x4000m, 3000m',
-        'date' : datetime.datetime(2021, 11, 8),
-        'pieces' : ['4000m', '4000m', '3000m'],
-        'scores' : {
-            '69' : ['15:12', '15:25' , '12:00'],
-            '1' : ['13:14', '14:20', '13:15']
-        },
-        'notes' : 'open rate',
-        'test' : False
-    }
-    workout2 = {
-        '_id' : 2,
-        'title' : '6x2000m',
-        'date' : datetime.datetime(2021, 10, 31),
-        'pieces' : ['2000m','2000m','2000m','2000m','2000m','2000m'],
-        'scores' : {
-            '69' : ['15:12', '15:25' , '12:00','15:12', '15:25' , '12:00'],
-            '1' : ['13:14', '14:20', '13:15','13:14', '14:20', '13:15']
-        },
-        'notes' : 'wowwwee',
-        'test' : False
-    }
+    # athlete1 = {
+    #     "_id" : 69,
+    #     "first" : "Henry",
+    #     "last" : "Vecchione",
+    #     "permissions" : ["admin"],
+    #     "prs" : {
+    #         "2000m" : "6:24",
+    #         "6000m" : "20:32"
+    #     },
+    #     "workouts" : [],
+    #     "side" : ["port"],
+    #     "class" : 2022,
+    #     "active" : True,
+    #     "awards" : {
+    #         "earc" : [],
+    #         "ira" : [],
+    #         "shirts" : ['g','de','n','da','t','p']
+    #     },
+    #     "teamId" : 1
+    # }
+    # athlete2 = {
+    #     "_id" : 1,
+    #     "first" : "Cal",
+    #     "last" : "Gorvy",
+    #     "permissions" : [],
+    #     "prs" : {
+    #         "2000m" : "5:59",
+    #         "6000m" : "17:24"
+    #     },
+    #     "workouts" : [],
+    #     "side" : ["starboard"],
+    #     "class" : 2025,
+    #     "active" : True,
+    #     "awards" : {
+    #         "earc" : ['4V'],
+    #         "ira" : ['1V'],
+    #         "shirts" : ['g','de','n','h','y','t','p']
+    #     },
+    #     "teamId" : 1
+    # }
+    # athlete3 = {
+    #     "_id" : 2,
+    #     "first" : "Peter",
+    #     "last" : "Skinner",
+    #     "permissions" : [],
+    #     "prs" : {
+    #         "2000m" : "5:59",
+    #         "6000m" : "17:24"
+    #     },
+    #     "workouts" : [],
+    #     "side" : ["port"],
+    #     "class" : 2023,
+    #     "active" : True,
+    #     "awards" : {
+    #         "earc" : ['4V'],
+    #         "ira" : ['1V'],
+    #         "shirts" : ['g','de','n','h','y','t','p']
+    #     },
+    #     "teamId" : 1
+    # }
+    # athlete4 = {
+    #     "_id" : 3,
+    #     "first" : "Will",
+    #     "last" : "Olson",
+    #     "permissions" : [],
+    #     "prs" : {
+    #         "2000m" : "5:59",
+    #         "6000m" : "17:24"
+    #     },
+    #     "workouts" : [],
+    #     "side" : ["port"],
+    #     "class" : 2023,
+    #     "active" : True,
+    #     "awards" : {
+    #         "earc" : ['4V'],
+    #         "ira" : ['1V'],
+    #         "shirts" : ['g','de','n','h','y','t','p']
+    #     },
+    #     "teamId" : 1
+    # }
+    # workout1 = {
+    #     '_id' : 1,
+    #     'title' : '2x4000m, 3000m',
+    #     'date' : datetime.datetime(2021, 11, 8),
+    #     'pieces' : ['4000m', '4000m', '3000m'],
+    #     'scores' : {
+    #         '69' : ['15:12', '15:25' , '12:00'],
+    #         '1' : ['13:14', '14:20', '13:15']
+    #     },
+    #     'notes' : 'open rate',
+    #     'test' : False
+    # }
+    # workout2 = {
+    #     '_id' : 2,
+    #     'title' : '6x2000m',
+    #     'date' : datetime.datetime(2021, 10, 31),
+    #     'pieces' : ['2000m','2000m','2000m','2000m','2000m','2000m'],
+    #     'scores' : {
+    #         '69' : ['15:12', '15:25' , '12:00','15:12', '15:25' , '12:00'],
+    #         '1' : ['13:14', '14:20', '13:15','13:14', '14:20', '13:15']
+    #     },
+    #     'notes' : 'wowwwee',
+    #     'test' : False
+    # }
 
     # pwPlain = b"sugmaLigma"
     # salt = bcrypt.gensalt()
@@ -378,4 +395,7 @@ if __name__ == "__main__":
 
     # print(editAthlete(69, 'first', 'wiener'))
 
-    print(editWorkout(75, 'title', "10k, 10x(30' on, 1:30 off)"))
+    # print(editWorkout(75, 'title', "10k, 10x(30' on, 1:30 off)"))
+    print(getAllAthletes(1887))
+    for athlete in getAllAthletes(1887):
+        print(removeWorkoutFromAthlete(athlete['id'], 92))
