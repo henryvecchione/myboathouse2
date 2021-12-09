@@ -35,6 +35,7 @@ def autoTitle(pieces):
 def averageOfOne(meters, time):
     """ Computes a split from meters and time """
     try:
+        h = time.hour
         m = time.minute
         s = time.second
         ms = time.microsecond
@@ -42,7 +43,7 @@ def averageOfOne(meters, time):
         print(str(e), ': in averageSplit. Was <time> a datetime.time?')
     finally:
         d = (meters / 500)
-        totalSec = (((m * 60) + s ) / d)
+        totalSec = (((h * 3600) + (m * 60) + s ) / d)
 
         splitMin =  int(totalSec // 60)
         splitSec = int((totalSec % 60) // 1)
@@ -60,9 +61,10 @@ def averageOfAll(scores):
         totalMeters += piece.meters
         totalSec += piece.time.minute * 60 + piece.time.second
 
-    totalMin = int(totalSec // 60)
-    totalSec = int(totalSec % 60)
-    totalTime = datetime.time(minute=totalMin, second=totalSec)
+    m, s = divmod(totalSec, 60)
+    h, m = divmod(m, 60)
+
+    totalTime = datetime.time(hour=h, minute=m, second=s)
 
     return averageOfOne(totalMeters, totalTime)
 

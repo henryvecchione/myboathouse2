@@ -10,7 +10,12 @@ class Workout:
     def __init__(self, athleteId, scores):
         self.athleteId = athleteId # int : ID of athlete doing the workout
         self.scores = scores # list of Piece objects 
-        self.split = averageOfAll(scores) # datetime.time average split
+        try:
+            self.split = averageOfAll(scores) # datetime.time average split
+        except Exception as e:
+            for score in scores:
+                print(score)
+            raise e
 
     """ append a Piece object """
     def addPiece(self, piece):

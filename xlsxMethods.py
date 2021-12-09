@@ -53,6 +53,7 @@ def xlsxRead(filename, teamId):
         scores = []
 
         for piece in pieces:
+            print('piece')
             try:
                 # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
@@ -88,12 +89,12 @@ def xlsxRead(filename, teamId):
                         t_split = piece.split(':')
                         time = datetime.time(minute=int(t_split[0]), second=int(t_split[1]))
                         meters = int(col[piece])
-                        print(f'{first} {last} went {meters}, timed piece: {piece}')
+                        print(f'{first} {last} went {meters}, timed piece.: {piece}')
                         p = Piece(meters, time, False)
                     else:
                         meters = int(piece.split('.')[0])
                         t = str(col[piece]).split(':')
-                        print(f'{first} {last} went {t}, distance piece: {meters}')
+                        print(f'{first} {last} went {t}, distance piece.: {meters}')
                         if t[0] == '00':
                             secSplit = t[2].split('.')
                             if len(secSplit) == 1:
@@ -107,6 +108,7 @@ def xlsxRead(filename, teamId):
                             time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
                         p = Piece(meters, time, True)
                     scores.append(p)
+                    print('piece appended', p)
                 else:
                     print(f"Distance/time mismatch: {piece} {col[piece]}")
                     return None
