@@ -478,7 +478,7 @@ def workout():
 
 
 @flask_login.login_required
-@app.route('/profile', methods=['GET'])
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user' not in session:
         return redirect('/login')
@@ -486,13 +486,22 @@ def profile():
         email = session['user']
     user = user_loader(email)
 
+    # if loading another athlete, pass in the id as 'a'
     if request.args.get('a'):
         athleteId = request.args.get('a')
+        athlete = db.queryAthlete(athleteId)
+
+        # security check: is the req'd athlete on the same team?
+        viewerTeam = db.queryAthlete(user.id)['teamId']
+        if viewerTeam != athlete['teamId']:
+            return make_response(render_template('error.html'))
+
+    # if no 'a', load the self's profile
     else:
         athleteId = user.id
-        ahlete = db.queryAthlete(athleteId)
+        athlete = db.queryAthlete(athleteId)
 
-    return NotImplemented
+    return render_template('profile.html', athlete=athlete)
 
 @flask_login.login_required
 @app.route('/team', methods=['GET', 'POST'])
