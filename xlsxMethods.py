@@ -52,8 +52,13 @@ def xlsxRead(filename, teamId):
 
         scores = []
 
+        dnf = False
         for piece in pieces:
-            print('piece')
+            if str(col[piece]) == 'DNF':
+                p = Piece(0, 0, False, True)
+                scores.append(p)
+                dnf = True
+                continue
             try:
                 # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
@@ -117,7 +122,7 @@ def xlsxRead(filename, teamId):
                 print("Distance/Time mismatch")
                 return None
                 
-        workout = Workout(athleteId, scores)
+        workout = Workout(athleteId, scores, dnf=dnf)
         workoutList.append(workout)
         
     try:

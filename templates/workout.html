@@ -82,7 +82,13 @@
                                         <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
                                         <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
                                         {% for piece in pieces %}
-                                            <td>{{piece.score(as_string=True)[0]}}</td>
+                                            {% set s = piece.score(as_string=True)[0] %}
+                                            {% if s == 'DNF' %}
+                                                <td style="color: red;">{{piece.score(as_string=True)[0]}}</td>
+                                                {% else %}
+                                                <td>{{piece.score(as_string=True)[0]}}</td>
+
+                                            {% endif %}
                                         {% endfor %}
                                         </div>
                                     </tr>
@@ -116,7 +122,13 @@
                                     <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
                                     <td>{{averages[athleteId]}}<span style="font-size: xx-small;">avg</td>
                                         {% for piece in pieces %}
-                                            <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+                                            {% set s = piece.score(as_string=True)[1] %}
+                                            {% if s == 'DNF' %}
+                                                <td style="color: red;">{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+                                                {% else %}
+                                                <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 </tr>

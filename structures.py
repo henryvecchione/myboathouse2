@@ -7,11 +7,14 @@ class Workout:
         pieces (list of Piece objects). e.g. a 6x2000m workout by athlete 
         no. 69 is a Workout with id = 69 and scores = [Piece(2000m), Piece(2000m)... x6]"""
 
-    def __init__(self, athleteId, scores):
+    def __init__(self, athleteId, scores, dnf=False):
         self.athleteId = athleteId # int : ID of athlete doing the workout
         self.scores = scores # list of Piece objects 
         try:
-            self.split = averageOfAll(scores) # datetime.time average split
+            if not dnf:
+                self.split = averageOfAll(scores) # datetime.time average split
+            else:
+                self.split = datetime.time(minute=9, second=59, microsecond=900000)
         except Exception as e:
             for score in scores:
                 print(score)
@@ -20,6 +23,9 @@ class Workout:
     """ append a Piece object """
     def addPiece(self, piece):
         self.scores.append(piece)
+        if piece.dnf:
+            self.dnf = True
+            self.split = datetime.time(minute=9, second=59, microsecond=900000)
 
     def watts(self):
         totalDist = 0
@@ -54,14 +60,22 @@ class Workout:
 
 class Piece:
     """ a single unit of erging, e.g. a 2000m or 5:00 piece. """ 
-    def __init__(self, meters, time, isDistance):
+    def __init__(self, meters, time, isDistance, dnf=False):
         try:
-            self.meters = meters
-            self.time = datetime.datetime.combine(datetime.date(2000, 2, 26), time)
-            self.split = datetime.datetime.combine(datetime.date(2000, 2, 26), averageOfOne(meters, time))
-             # Bool: True if the workout was a distance workout, e.g. a 2000m or 6000m piece. 
-             # False if it's a timed piece, e.g. 30:00, 10:00
-            self.isDistance = isDistance
+            # if did not finish, set this to True
+            self.dnf = dnf
+            if not self.dnf:
+                self.meters = meters
+                self.time = datetime.datetime.combine(datetime.date(2000, 2, 26), time)
+                self.split = datetime.datetime.combine(datetime.date(2000, 2, 26), averageOfOne(meters, time))
+                # Bool: True if the workout was a distance workout, e.g. a 2000m or 6000m piece. 
+                # False if it's a timed piece, e.g. 30:00, 10:00
+                self.isDistance = isDistance
+            else:
+                self.meters = 0
+                self.time = datetime.datetime.combine(datetime.date(2000, 2, 26), datetime.time(0,0,0,0))
+                self.split = time
+                self.isDistance = isDistance
         except Exception as e:
             print(str(e), ': in class Piece. Is the time a datetime.time?')
             return
@@ -71,6 +85,11 @@ class Piece:
         """ returns the 'score', i.e. how the athlete performed over the prescribed
             distance or time, in a tuple with the split. e.g for a 2000m piece, 
             returns (6:20, 1:35), for a 30:00, returns (8411, 1:47)"""
+        if self.dnf:
+            if as_string:
+                return "DNF" , "DNF"
+            else:
+                return self.meters, self.split
         if not as_string:   
             if self.isDistance:
                 return (self.time, self.split)
@@ -84,14 +103,18 @@ class Piece:
                 return (str(self.meters), splitStr)
 
     def watts(self):
-        # from https://www.concept2.com/indoor-rowers/training/calculators/watts-calculator : 
-        # watts = 2.80/pace**3, where pace = total seconds / meters 
-        totalSec = self.time.minute * 60 + self.time.second + (self.time.microsecond/1000000)
-        pace = totalSec / self.meters
+        try:
+            # from https://www.concept2.com/indoor-rowers/training/calculators/watts-calculator : 
+            # watts = 2.80/pace**3, where pace = total seconds / meters 
+            totalSec = self.time.minute * 60 + self.time.second + (self.time.microsecond/1000000)
+            pace = totalSec / self.meters
 
-        watts = 2.80/(pace**3)
+            watts = 2.80/(pace**3)
 
-        return int(watts//1)
+            return int(watts//1)
+        except ZeroDivisionError as e:
+            # caused if DNF
+            return 0 
 
 
     def __str__(self):
