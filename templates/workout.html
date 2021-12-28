@@ -124,7 +124,7 @@
                                         {% for piece in pieces %}
                                             {% set s = piece.score(as_string=True)[1] %}
                                             {% if s == 'DNF' %}
-                                                <td style="color: red;">{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
+                                                <td style="color: red;">{{piece.score(as_string=True)[1]}}</td>
                                                 {% else %}
                                                 <td>{{piece.score(as_string=True)[1]}}<span style="font-size: xx-small;">avg</span></td>
 

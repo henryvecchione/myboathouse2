@@ -9,6 +9,18 @@
         <script src="https://code.jquery.com/jquery-3.6.0.slim.js"   integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY="   crossorigin="anonymous"></script>
     </head>
     <body>
+
+        <style>
+            .card-text {
+                margin:0;
+                position:absolute;
+                top: 50%;
+                -ms-transform: translateY(-50%);
+                transform: translateY(-50%);
+            }
+        </style>
+
+
         <div class="container-fluid">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
@@ -27,38 +39,102 @@
                 </div>
             </nav>
             <div class="card">
-
-                <h1 class="card-title">How to upload a workout</h1>
-                <h3 class="card-title">Step 1: Get a workout sheet template</h3>
-                <p class="card-text">
-                    On the "home" screen, select "Blank sheet" under the "Upload workout" header. 
-                    This will download an Excel file named "workout_d_m_y.xlsx" (where d, m, y are the day, month, year respectively). Open the file.
-                </p>
-                <h3 class="card-title">Step 2: Fill out the template</h3>
-                <p class="card-text">
-                    Filling out the template correctly is important for irgo to be able to read it. Times and distances 
-                    need to be formatted correctly, and the text 'irgo' and 'Piece:' in the header row must not be changed.
-                </p>
-                <p class="card-text">
-                    First, fill out information about the workout. Make sure the date (cell A2) is correct. Next, 
-                    in the header row, edit the cells with '(XXXX | mm:ss) with the pieces. Distance pieces should be entered as 
-                    the number of meters, and time pieces should be minutes : seconds. <em>E.g., a 6k goes in as '6000', 
-                    a 30-minute goes in as '30:00'. </em>
-                </p>
-                <p class="card-text">
-                    Next, fill out the athlete names. The roster of athletes is filled out in the "roster" sheet, 
-                    with which the "First" field (column A) is filled with a VLOOKUP. Enter the last names, and make sure that a 
-                    first name is filled in. If it returns an error, check the spelling or that the athlete is on the roster.
-                </p>
-                <p class="card-text">
-                    Finally, fill out the scores. Like the pieces, formatting is important. For distance pieces, you must enter the score 
-                    as a time (format: mm:ss). For timed pieces, you must enter a distance (format: dddd). The upload will not work if these are mismatched.
-                </p>
-                <h3 class="card-title">Step 3: Upload the workout</h3>
-                <p class="card-text">
-                    Go back to irgo, to the home screen. Select "Upload Sheet", where you will be prompted to choose a file from your computer. 
-                    Choose the file you filled out. If it was successful, you will be redirected to the page showing that workout. Congrats, you've uploaded a workout.  
-                </p>
+                <div class="col">
+                    <div class="row">
+                        <h1 class="card-title">How to upload a workout</h1>
+                    </div>
+                    <div class="row">
+                        <h3 class="card-title">Step 1: Get a workout sheet template</h3>
+                        <div class="col-6">
+                            <img src="{{ url_for('static', filename='step1.png')}}" width="100%" height="auto">
+                        </div>
+                        <div class="col-6">
+                            <p class="card-text">
+                                On the "home" screen, select "Blank sheet" under the "Upload workout" header. 
+                                This will download an Excel file named "workout_d_m_y.xlsx" (where d, m, y are the day, month, year respectively). Open the file.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h3 class="card-title">Step 2: Fill out the template</h3>
+                        <div class="row">
+                            <div class="col-6">
+                                <img src="{{ url_for('static', filename='step2.png')}}" width="100%" height="auto">
+                            </div>
+                            <div class="col-6">
+                                <p class="card-text">
+                                    Filling out the template correctly is important for irgo to be able to read it. Times and distances 
+                                    need to be formatted correctly, and the text 'irgo' and 'Piece:' in the header row must not be changed.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <img src="{{ url_for('static', filename='step3.png')}}" width="100%" height="auto">
+                            </div>
+                            <div class="col-6">
+                                <p class="card-text">
+                                    First, fill out information about the workout. Make sure the date (cell A2) is correct. Next, 
+                                    in the header row, edit the cells with '(XXXX | mm:ss) with the pieces. Distance pieces should be entered as 
+                                    the number of meters, and time pieces should be minutes : seconds. <em>E.g., a 6k goes in as '6000', 
+                                    a 30-minute goes in as '30:00'. </em>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <img src="{{ url_for('static', filename='step4.png')}}" width="100%" height="auto">
+                            </div>
+                            <div class="col-6">
+                                <p class="card-text">
+                                    Next, fill out the athlete names. The roster of athletes is filled out in the "roster" sheet, 
+                                    with which the "First" field (column A) is filled with a VLOOKUP. Enter the last names, and make sure that a 
+                                    first name is filled in. If it returns an error, check the spelling or that the athlete is on the roster.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <img src="{{ url_for('static', filename='step5.png')}}" width="100%" height="auto">
+                            </div>
+                            <div class="col-6">
+                                <p class="card-text">
+                                    Finally, fill out the scores. Like the pieces, formatting is important. For distance pieces, you must enter the score 
+                                    as a time (format: mm:ss). For timed pieces, you must enter a distance (format: dddd). The upload will not work if these are mismatched.
+                                </p>
+                            </div>
+                        </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h3 class="card-title">Step 3: Upload the workout</h3>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <img src="{{ url_for('static', filename='step6.png')}}" width="100%" height="auto">
+                                </div>
+                                <div class="col-6">
+                                    <img src="{{ url_for('static', filename='step7.png')}}" width="100%" height="auto">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <p class="card-text">
+                                Go back to irgo, to the home screen. Select "Upload Sheet", where you will be prompted to choose a file from your computer. 
+                                Choose the file you filled out. If it was successful, you will be redirected to the page showing that workout. Congrats, you've uploaded a workout.  
+                            </p>
+                        </div>
+                    </div>
+                <h3 class="card-title"></h3>
+                
+                
+                
+                
+                
+                
+                </div>
             </div>
 
 

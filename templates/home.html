@@ -104,10 +104,12 @@
             </div>
 
 
-
-
-
         </div>
+        {% if request.args.get('e') %}
+            <script>
+                alert("{{request.args.get('em')}}");
+            </script>
+        {% endif %}
 
         <script>
             $("#file").change(function () {

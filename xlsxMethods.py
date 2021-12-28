@@ -47,8 +47,8 @@ def xlsxRead(filename, teamId):
         try:
             athleteId = str(db.queryAthleteByName(first, last)['_id'])
         except Exception as e:
-            print(str(e), f': in xlsxRead(), check the spelling of {first} {last}')
-            continue
+            return False, f': in xlsxRead(), check the spelling of {first} {last}'
+            
 
         scores = []
 
@@ -62,65 +62,71 @@ def xlsxRead(filename, teamId):
             try:
                 # if the piece is an int, e.g. 2000, make a distance piece
                 if isinstance(piece, int):
-                    t = str(col[piece]).split(':')
-                    print(f'{first} {last} went {t}, distance piece: {piece}')
-                    # sometimes the time comes out like ['00', 'MM', 'SS.TT']
-                    if t[0] == '00':
-                        secSplit = t[2].split('.')
-                        # if the tenth is 0, the seconds are 'SS', not 'SS.00'
-                        if len(secSplit) == 1:
-                            t_sec = secSplit[0]
-                            t_tenth = 0
-                        else:
-                            t_sec, t_tenth = t[2].split('.') 
-                        time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
-                    # otherwise it's like ['MM', 'SS.TT']
-                    else:
-                        t_tenth = (t[2].split('.'))[1]
-                        time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
-                    p = Piece(piece, time, True)
-                    scores.append(p)
-                # else if its a datetime, make a time piece
-                elif isinstance(piece, datetime.time):
-                    meters = int(col[piece])
-                    print(f'{first} {last} went {meters}, timed piece: {piece}')
-                    time = datetime.time(minute=piece.hour, second=piece.minute)
-                    p = Piece(meters, time, False)
-                    scores.append(p)
-                # read_excel, if there are duplicate col headers, appends a .X, e.g 2000, 2000.1, 2000.2... 
-                # trim this off, make it an int
-                elif '.' in piece:
-                    if ':' in piece:
-                        t_split = piece.split(':')
-                        time = datetime.time(minute=int(t_split[0]), second=int(t_split[1]))
-                        meters = int(col[piece])
-                        print(f'{first} {last} went {meters}, timed piece.: {piece}')
-                        p = Piece(meters, time, False)
-                    else:
-                        meters = int(piece.split('.')[0])
+                    try:
                         t = str(col[piece]).split(':')
-                        print(f'{first} {last} went {t}, distance piece.: {meters}')
+                        print(f'{first} {last} went {t}, distance piece: {piece}')
+                        # sometimes the time comes out like ['00', 'MM', 'SS.TT']
                         if t[0] == '00':
                             secSplit = t[2].split('.')
+                            # if the tenth is 0, the seconds are 'SS', not 'SS.00'
                             if len(secSplit) == 1:
                                 t_sec = secSplit[0]
                                 t_tenth = 0
                             else:
                                 t_sec, t_tenth = t[2].split('.') 
                             time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
+                        # otherwise it's like ['MM', 'SS.TT']
                         else:
                             t_tenth = (t[2].split('.'))[1]
                             time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
-                        p = Piece(meters, time, True)
-                    scores.append(p)
-                    print('piece appended', p)
+                        p = Piece(piece, time, True)
+                        scores.append(p)
+                    except Exception as e:
+                        return False, f'Exception caught in row {i+2}: ' + str(e)
+                # else if its a datetime, make a time piece
+                elif isinstance(piece, datetime.time):
+                    try:
+                        meters = int(col[piece])
+                        time = datetime.time(minute=piece.hour, second=piece.minute)
+                        print(f'{first} {last} went {meters}, timed piece: {piece}')
+                        p = Piece(meters, time, False)
+                        scores.append(p)
+                    except Exception as e:
+                        return False, f'Exception caught in row {i+2}:' + str(e)
+                # read_excel, if there are duplicate col headers, appends a .X, e.g 2000, 2000.1, 2000.2... 
+                # trim this off, make it an int
+                elif '.' in piece:
+                    try:
+                        if ':' in piece:
+                            t_split = piece.split(':')
+                            time = datetime.time(minute=int(t_split[0]), second=int(t_split[1]))
+                            meters = int(col[piece])
+                            print(f'{first} {last} went {meters}, timed piece.: {piece}')
+                            p = Piece(meters, time, False)
+                        else:
+                            meters = int(piece.split('.')[0])
+                            t = str(col[piece]).split(':')
+                            print(f'{first} {last} went {t}, distance piece.: {meters}')
+                            if t[0] == '00':
+                                secSplit = t[2].split('.')
+                                if len(secSplit) == 1:
+                                    t_sec = secSplit[0]
+                                    t_tenth = 0
+                                else:
+                                    t_sec, t_tenth = t[2].split('.') 
+                                time = datetime.time(minute=int(t[1]), second=int(t_sec), microsecond=int(t_tenth))
+                            else:
+                                t_tenth = (t[2].split('.'))[1]
+                                time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
+                            p = Piece(meters, time, True)
+                        scores.append(p)
+                    except Exception as e:
+                        return False, f'Exception caught in row {i+2}: ' + str(e)
                 else:
                     print(f"Distance/time mismatch: {piece} {col[piece]}")
-                    return None
+                    return False, f"Error in row {i+2}. Maybe a distance/time mismatch?"
             except TypeError as e:
-                print(str(e))
-                print("Distance/Time mismatch")
-                return None
+                return False, f"Exception caught at row {i+2}: " +str(e) + ". Maybe a time/distance mismatch?"
                 
         workout = Workout(athleteId, scores, dnf=dnf)
         workoutList.append(workout)
@@ -143,7 +149,7 @@ def xlsxRead(filename, teamId):
     }
 
     print('read xlsx file')
-    return workoutDict
+    return True, workoutDict
 
 
 

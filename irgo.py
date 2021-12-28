@@ -5,6 +5,7 @@ import flask_login
 import requests
 import os
 import urllib3
+import urllib
 import database as db
 import random
 import bcrypt
@@ -152,7 +153,7 @@ def download():
 
 """ upload a .xlsx file for processing and storing in database """
 @flask_login.login_required
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=["GET", 'POST'])
 def upload():
     if 'user' not in session:
         return redirect('/login')
@@ -163,13 +164,20 @@ def upload():
     athlete = db.queryAthlete(athleteId)
     teamId = athlete['teamId']
 
+    if request.method == "GET":
+        return redirect('/home')
+
     file = request.files['sheet']
+
     try:
-        workout = xlsxMethods.xlsxRead(file, teamId)
+        success, workout = xlsxMethods.xlsxRead(file, teamId)
+        if not success:
+            message = urllib.parse.quote(workout)
+            return redirect(f'/home?e=1&em={message}')
+
         addedId = db.addWorkout(workout, teamId)
         if not addedId:
             flash("failed to add workout")
-            return redirect('/home')
         else:
             print(f'Sheet uploaded by {athlete["first"]} {athlete["last"]}. WorkoutId: {addedId}')
 
@@ -180,10 +188,9 @@ def upload():
                 pickledWorkout = Binary(pickle.dumps(workout))
                 print(f'attributed to {athleteId}')
                 edited = db.addWorkoutToAthlete(athleteId, pickledWorkout, addedId)
-                print(edited)
-
 
             return redirect('workout?w={}'.format(addedId))
+        
     except Exception as e:
         print(str(e), ' in upload')
         flash("There was an error uploading the file")
