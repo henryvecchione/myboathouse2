@@ -179,7 +179,7 @@ def xlsxBlank(teamId):
     bold = workbook.add_format({'bold' : True})
 
     # score sheet header info
-    header = ['irgo', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
+    header = ['Mod:', 'irgo', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     notes = [date, 'Notes:']
     firstLast = ['First', 'Last']
