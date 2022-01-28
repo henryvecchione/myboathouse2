@@ -7,9 +7,10 @@ class Workout:
         pieces (list of Piece objects). e.g. a 6x2000m workout by athlete 
         no. 69 is a Workout with id = 69 and scores = [Piece(2000m), Piece(2000m)... x6]"""
 
-    def __init__(self, athleteId, scores, dnf=False):
+    def __init__(self, athleteId, scores, dnf=False, mod=None):
         self.athleteId = athleteId # int : ID of athlete doing the workout
         self.scores = scores # list of Piece objects 
+        self.mod = mod
         try:
             if not dnf:
                 self.split = averageOfAll(scores) # datetime.time average split

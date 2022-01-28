@@ -78,7 +78,6 @@ def queryAthleteByName(first, last):
         return None
 
 def getAllAthletes(teamId, sort_by='name', active_only=False):
-    print(f'getAllAthletes called with {teamId}')    
     try:
         collection_name = getCollection(ATHLETE_COLLECTION)
         if active_only:

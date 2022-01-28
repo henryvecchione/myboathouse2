@@ -183,12 +183,14 @@ def upload():
 
             # attribute the workout to the participating athletes
             allScores = pickle.loads(workout['scores'])
+            ctr = 0
             for workout in allScores:
                 athleteId = workout.athleteId
                 pickledWorkout = Binary(pickle.dumps(workout))
-                print(f'attributed to {athleteId}')
+                print(f'attributed to {athleteId}', end='\r')
+                ctr += 1
                 edited = db.addWorkoutToAthlete(athleteId, pickledWorkout, addedId)
-
+            print(f'Added to {ctr} profiles')
             return redirect('workout?w={}'.format(addedId))
         
     except Exception as e:
@@ -421,17 +423,17 @@ def delete():
 
 
         if deleted:
+            ctr = 0
             for athlete in db.getAllAthletes(athlete['teamId']):
                 res = db.removeWorkoutFromAthlete(athlete['_id'], workoutId)
-                print(f'unattributed {workoutId} from {athlete["_id"]} : {res}')
-            print(f'workout {workoutId} deleted by {athlete["first"]} {athlete["last"]}')
+                print(f'unattributing {workoutId} from {athlete["_id"]}', end='\r')
+                ctr += 1
+            print(f'workout {workoutId} deleted, removed from {ctr} profiles')
             return redirect('/workouts')
 
     workout = db.queryWorkout(workoutId)
     html = render_template('confirmDelete.html', workout=workout, wid=workoutId, aid=athleteId)
     return make_response(html)
-
-
 
 
 """ display a single workout """
@@ -455,24 +457,45 @@ def workout():
     practice = db.queryWorkout(workoutId)
 
     results = practice['scores']
+    notes = ", ".join([str(n) for n in practice['notes']])
     athletes = {}
     scoresDict = {}
     averages = {}
+
+    bikeAthletes = {}
+    bikeScores = {}
+    bikeAverages = {}
+
+
     for workout in results:
         athleteId = workout.athleteId
         ath = db.queryAthlete(athleteId)
-        athletes[athleteId] = {
+
+        ad = {
             'first' : ath['first'],
             'last' : ath['last'],
             'side' : ath['side']
         }
-        scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
-        averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+
+        if hasattr(workout, 'mod'):
+            if workout.mod == 'B': # if bike modifier, add them to bike athletes
+                bikeAthletes[athleteId] = ad
+                bikeScores[athleteId] = workout.split, workout.scores, workout.watts()
+                bikeAverages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+            else:
+                athletes[athleteId] = ad
+                scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
+                averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+        else:      
+            athletes[athleteId] = ad
+            scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
+            averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
 
 
     scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
+    bikeScores_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
 
-    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, isAdmin=isAdmin)
+    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, bikeScores=bikeScores_sorted, bikeAthletes=bikeAthletes, bikeAverages=bikeAverages, isAdmin=isAdmin, athId=user.id)
     return make_response(html)
 
 

@@ -26,7 +26,7 @@ def xlsxRead(filename, teamId):
     date = data[0]['irgo']
     if 'Y' in date or 'M' in date or 'D' in date:
         date = datetime.datetime.now()
-    pieces = list(data.index)[2:] 
+    pieces = list(data.index)[3:] 
 
     notes = list(note for note in data[0][2:] if note) # all non-empty notes
 
@@ -41,7 +41,13 @@ def xlsxRead(filename, teamId):
         try:
             first = col['irgo'].capitalize()
             last = col['Piece:'].capitalize()
-        except Exception as _:
+            mod = col['Mod:']
+            if isinstance(mod, str):
+                mod = mod.capitalize()
+            else:
+                mod = None
+        except Exception as e:
+            print(str(e), ': in xlsxRead')
             continue
 
         try:
@@ -64,7 +70,7 @@ def xlsxRead(filename, teamId):
                 if isinstance(piece, int):
                     try:
                         t = str(col[piece]).split(':')
-                        print(f'{first} {last} went {t}, distance piece: {piece}')
+                        print(f'{first} {last} went {t}, distance piece: {piece}', end='\r')
                         # sometimes the time comes out like ['00', 'MM', 'SS.TT']
                         if t[0] == '00':
                             secSplit = t[2].split('.')
@@ -105,12 +111,12 @@ def xlsxRead(filename, teamId):
                             t_split = piece.split(':')
                             time = datetime.time(minute=int(t_split[0]), second=int(t_split[1]))
                             meters = int(col[piece])
-                            print(f'{first} {last} went {meters}, timed piece.: {piece}')
+                            print(f'{first} {last} went {meters}, timed piece: {piece}')
                             p = Piece(meters, time, False)
                         else:
                             meters = int(piece.split('.')[0])
                             t = str(col[piece]).split(':')
-                            print(f'{first} {last} went {t}, distance piece.: {meters}')
+                            print(f'{first} {last} went {t}, distance piece: {meters}')
                             if t[0] == '00':
                                 secSplit = t[2].split('.')
                                 if len(secSplit) == 1:
@@ -132,7 +138,7 @@ def xlsxRead(filename, teamId):
             except TypeError as e:
                 return False, f"Exception caught at row {i+2}: " +str(e) + ". Maybe a time/distance mismatch?"
                 
-        workout = Workout(athleteId, scores, dnf=dnf)
+        workout = Workout(athleteId, scores, dnf=dnf, mod=mod)
         workoutList.append(workout)
         
     try:
