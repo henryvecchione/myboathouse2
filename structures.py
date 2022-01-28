@@ -63,7 +63,11 @@ class Piece:
     def __init__(self, meters, time, isDistance, dnf=False):
         try:
             # if did not finish, set this to True
-            self.dnf = dnf
+            if meters == 0:
+                self.dnf = True
+            else:
+                self.dnf = dnf
+
             if not self.dnf:
                 self.meters = meters
                 self.time = datetime.datetime.combine(datetime.date(2000, 2, 26), time)
@@ -90,6 +94,7 @@ class Piece:
                 return "DNF" , "DNF"
             else:
                 return self.meters, self.split
+
         if not as_string:   
             if self.isDistance:
                 return (self.time, self.split)

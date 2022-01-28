@@ -79,7 +79,11 @@ def xlsxRead(filename, teamId):
                         else:
                             t_tenth = (t[2].split('.'))[1]
                             time = datetime.time(minute=int(t[0]), second=int(t[1]), microsecond=int(t_tenth))
-                        p = Piece(piece, time, True)
+                        # if dist is zero, that's a DNF
+                        if piece == 0:
+                            p = Piece(piece, time, True, dnf=True)
+                        else:
+                            p = Piece(piece, time, True)
                         scores.append(p)
                     except Exception as e:
                         return False, f'Exception caught in row {i+2}: ' + str(e)

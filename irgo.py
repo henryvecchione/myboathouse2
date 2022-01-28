@@ -423,7 +423,6 @@ def delete():
         if deleted:
             for athlete in db.getAllAthletes(athlete['teamId']):
                 res = db.removeWorkoutFromAthlete(athlete['_id'], workoutId)
-                res = db.removeWorkoutFromAthlete(athlete['_id'], 92) # clean db on nex run
                 print(f'unattributed {workoutId} from {athlete["_id"]} : {res}')
             print(f'workout {workoutId} deleted by {athlete["first"]} {athlete["last"]}')
             return redirect('/workouts')

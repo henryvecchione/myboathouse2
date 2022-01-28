@@ -112,7 +112,6 @@ def removeWorkoutFromAthlete(athleteId, workoutId):
 def addWorkout(workoutDict, teamId):
     # print(f'addworkout called with {workoutDict}, {teamId}')
     try:
-        print(workoutDict)
         collection_name = getCollection(WORKOUT_COLLECTION)
         workoutDict['teamId'] = teamId
         result = collection_name.insert_one(workoutDict)
