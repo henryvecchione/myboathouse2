@@ -467,35 +467,53 @@ def workout():
     bikeAverages = {}
 
 
+    # for workout in results:
+    #     athleteId = workout.athleteId
+    #     ath = db.queryAthlete(athleteId)
+
+    #     ad = {
+    #         'first' : ath['first'],
+    #         'last' : ath['last'],
+    #         'side' : ath['side']
+    #     }
+
+    #     if hasattr(workout, 'mod'):
+    #         if workout.mod == 'B': # if bike modifier, add them to bike athletes
+    #             bikeAthletes[athleteId] = ad
+    #             bikeScores[athleteId] = workout.split, workout.scores, workout.watts()
+    #             bikeAverages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+    #         else:
+    #             athletes[athleteId] = ad
+    #             scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
+    #             averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+    #     else:      
+    #         athletes[athleteId] = ad
+    #         scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
+    #         averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+
+
+    # scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
+    # bikeScores_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
+
+    # html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, bikeScores=bikeScores_sorted, bikeAthletes=bikeAthletes, bikeAverages=bikeAverages, isAdmin=isAdmin, athId=user.id)
+    # return make_response(html)
+
     for workout in results:
         athleteId = workout.athleteId
         ath = db.queryAthlete(athleteId)
-
-        ad = {
+        athletes[athleteId] = {
             'first' : ath['first'],
             'last' : ath['last'],
             'side' : ath['side']
         }
-
-        if hasattr(workout, 'mod'):
-            if workout.mod == 'B': # if bike modifier, add them to bike athletes
-                bikeAthletes[athleteId] = ad
-                bikeScores[athleteId] = workout.split, workout.scores, workout.watts()
-                bikeAverages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
-            else:
-                athletes[athleteId] = ad
-                scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
-                averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
-        else:      
-            athletes[athleteId] = ad
-            scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
-            averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
+        scoresDict[athleteId] = workout.split, workout.scores, workout.watts()
+        averages[athleteId] = workout.split.strftime('%-M:%S.%f')[:-5]
 
 
     scoresDict_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
-    bikeScores_sorted = sorted(scoresDict.items(), key=lambda wo:wo[1][0])
+    viewer = athlete['first'] + ' ' + athlete['last']
 
-    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, bikeScores=bikeScores_sorted, bikeAthletes=bikeAthletes, bikeAverages=bikeAverages, isAdmin=isAdmin, athId=user.id)
+    html = render_template('workout.html' , workout=practice, scores=scoresDict_sorted, athletes=athletes, averages=averages, isAdmin=isAdmin, viewer=viewer)
     return make_response(html)
 
 

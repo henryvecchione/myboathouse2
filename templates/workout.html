@@ -58,6 +58,8 @@
                         </div>
                     </div>
 
+<!-- raw score table  -->
+
                     <div style="overflow-x: scroll;" >
                         <div id="raw div" >
                             <table class="table">
@@ -77,7 +79,11 @@
                                     {% set athleteId = id[0] %}
                                     {% set avg = id[1][0] %}
                                     {% set pieces = id[1][1] %}
-                                    <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
+                                    <tr {% if loop.index % 2 == 0 %} 
+                                            style="background-color:#f6f6f6;" 
+                                        {% elif athletes[athleteId]['first'] + ' ' + athletes[athleteId]['last'] == viewer %}
+                                            style="background-color:#ffdca8;"
+                                         {% endif %}>
                                         <th scope="row">{{loop.index}}</th>
                                         <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
                                         <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
@@ -98,7 +104,8 @@
                             </table>
                         </div>
 
-                        
+
+<!-- split score table  -->
                     <div id="split div" style="display: none;">
                         <table class="table">
                             <thead>
@@ -117,7 +124,11 @@
                                 {% set athleteId = id[0] %}
                                 {% set avg = id[1][0] %}
                                 {% set pieces = id[1][1] %}
-                                <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
+                                <tr {% if loop.index % 2 == 0 %} 
+                                        style="background-color:#f6f6f6;" 
+                                    {% elif athletes[athleteId]['first'] + ' ' + athletes[athleteId]['last'] == viewer %}
+                                        style="background-color:#ffdca8;"
+                                    {% endif %}>
                                     <th scope="row">{{loop.index}}</th>
                                     <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
                                     <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>
@@ -139,6 +150,7 @@
                         </table>
                     </div>
 
+<!-- watt score table -->
                     <div id="watt div" style="display: none;">
                         <table class="table">
                             <thead>
@@ -157,7 +169,11 @@
                                 {% set athleteId = id[0] %}
                                 {% set avg = id[1][0] %}
                                 {% set pieces = id[1][1] %}
-                                <tr {% if loop.index % 2 == 0 %} style="background-color:#f6f6f6;" {% endif %}>
+                                <tr {% if loop.index % 2 == 0 %} 
+                                        style="background-color:#f6f6f6;" 
+                                    {% elif athletes[athleteId]['first'] + ' ' + athletes[athleteId]['last'] == viewer %}
+                                        style="background-color:#ffdca8;"
+                                    {% endif %}>
                                     <th scope="row">{{loop.index}}</th>
                                     <td>{{athletes[athleteId]['first']}} {{athletes[athleteId]['last']}} </td>
                                     <td>{% if athletes[athleteId]['side'] == 'port' %}<em style="color: red;">P</em> {% elif athletes[athleteId]['side'] == 'starboard' %}<em style="color: green;">S</em> {% elif athletes[athleteId]['side'] == 'cox' %} <em style="color: grey;">C</em> {% endif %}</td>

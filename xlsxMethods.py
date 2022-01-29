@@ -181,18 +181,18 @@ def xlsxBlank(teamId):
     # score sheet header info
     header = ['Mod:', 'irgo', 'Piece:', '(XXXX | mm:ss)', '(XXXX | mm:ss)', '(XXXX | mm:ss)']
     date = datetime.datetime.now().strftime('%Y-%m-%d')
-    notes = [date, 'Notes:']
-    firstLast = ['First', 'Last']
-    example = ['(mm:ss | YYYY)','(mm:ss | YYYY)','(mm:ss | YYYY)']
+    notes = ['', date, 'Notes:']
+    firstLast = ['', 'First', 'Last']
+    example = ['', '(mm:ss | YYYY)','(mm:ss | YYYY)','(mm:ss | YYYY)']
     worksheet.write_row('A1', header, bold)
     worksheet.write_row('A2', notes, bold)
     worksheet.write_row('A3', firstLast, bold)
     worksheet.write_row('C4', example)
 
-    # write the vlookup formula that fills names from the roser
+    # write the vlookup formula that fills names from the roster
     for i in range(4, 50):
-        cell = 'A' + str(i)
-        formula = '=IF(B{}<>"",VLOOKUP(B{},roster!A:B,2,FALSE), "")'.format(str(i),str(i))
+        cell = 'B' + str(i)
+        formula = '=IF(C{}<>"",VLOOKUP(C{},roster!A:B,2,FALSE), "")'.format(str(i),str(i))
         worksheet.write_formula(cell, formula)
 
     # write in the athletes
