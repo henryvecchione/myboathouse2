@@ -81,6 +81,12 @@ def index():
     html = render_template('index.html')
     return make_response(html)
 
+""" renders the about page """
+@app.route('/about', methods=['GET'])
+def about():
+    html = render_template('about.html')
+    return make_response(html)
+
 """ renders the home page """
 @flask_login.login_required
 @app.route('/home', methods=['GET'])
