@@ -21,7 +21,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 TEMPLATE_DIR = './templates'
 STATIC_DIR = './static'
 
-
 if 'secret_key' not in os.environ:
     from dotenv import load_dotenv
     load_dotenv()
