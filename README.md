@@ -4,6 +4,9 @@
 ### Version 1.0 
 *irgo is based on the original, now defunct MyBoathouse, developed for COS333 by Lucas Manning and others*
 
+## Develop locally:
+Navigate to the root directory and run `python3 runserver.py <port>`
+
 ## What it does 
 irgo is a way to keep a rowing team's erg workout data in one place, allowing rowers to compare their scores with others, track performance over time, and look back on scores from previous years. It also allows coxswains and coaches to easily upload workout data. 
 
